@@ -1,0 +1,221 @@
+# ===================================
+# Cat Canteen V3 - .gitignore
+# ===================================
+# 依據專案憲法 v1.1.0 - 敏感資訊保護規範
+
+# ===================================
+# 敏感資訊 (絕對禁止上傳！)
+# ===================================
+
+# 環境變數檔案
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+*.env
+
+# API Keys 和 Tokens
+**/secrets/
+**/credentials/
+*.key
+*.pem
+*.pfx
+*.p12
+*.cer
+*.crt
+**/api_keys.json
+**/tokens.json
+credentials.json
+
+# 資料庫連線資訊
+database.ini
+db_config.json
+connection_strings.txt
+
+# 密碼檔案
+passwords.txt
+*.password
+*_password.*
+
+# ===================================
+# Python & UV 套件管理
+# ===================================
+
+# UV 虛擬環境
+.venv/
+venv/
+ENV/
+env/
+
+# Python 編譯檔案
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# 分發 / 打包
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# 測試覆蓋率報告
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# ===================================
+# IDE 設定檔案
+# ===================================
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ===================================
+# 作業系統檔案
+# ===================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ===================================
+# 日誌與暫存檔案
+# ===================================
+
+# 日誌檔案
+*.log
+logs/
+*.log.*
+
+# 暫存檔案
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ===================================
+# 資料庫檔案 (本地開發)
+# ===================================
+
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# ===================================
+# 備份檔案
+# ===================================
+
+*.bak
+*.backup
+*.old
+*.orig
+
+# ===================================
+# Claude Code 專案設定 (可能包含敏感資訊)
+# ===================================
+
+.claude/settings.local.json
+
+# ===================================
+# Node.js & Frontend (pnpm)
+# ===================================
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# pnpm
+.pnpm-debug.log*
+
+# Testing
+coverage/
+
+# Production build
+dist/
+build/
+.next/
+out/
+
+# Vite
+.vite/
+.vite-cache/
+
+# TypeScript
+*.tsbuildinfo
+
+# ESLint
+.eslintcache
+
+# ===================================
+# Docker
+# ===================================
+
+# Docker volumes
+docker-compose.override.yml
+
+# ===================================
+# 其他專案特定排除項目
+# ===================================
+
+# Alembic (database migrations)
+backend/migrations/versions/*.pyc
+
+# Test fixtures (keep .json examples, ignore generated ones)
+backend/tests/fixtures/generated/
