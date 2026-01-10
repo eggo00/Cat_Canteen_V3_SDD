@@ -1,16 +1,10 @@
 """Unit tests for ThemeConfig value object.
 
 Tests theme configuration validation including color format validation.
-
-⚠️ TDD: These tests should FAIL initially until ThemeConfig is implemented.
 """
 import pytest
 
-# Will be implemented in src/domain/value_objects/theme_config.py
-# from src.domain.value_objects.theme_config import ThemeConfig
 
-
-@pytest.mark.skip(reason="ThemeConfig not yet implemented")
 class TestThemeConfigValueObject:
     """Test ThemeConfig value object validation."""
 
@@ -32,11 +26,11 @@ class TestThemeConfigValueObject:
 
     def test_theme_config_requires_primary_color(self):
         """Test that primary color is required."""
-        from src.domain.value_objects.theme_config import ThemeConfig, ValidationError
+        from src.domain.value_objects.theme_config import ThemeConfig
 
         # Act & Assert
-        with pytest.raises(ValidationError):
-            ThemeConfig(secondary_color="#000000")
+        with pytest.raises(TypeError):
+            ThemeConfig(secondary_color="#000000")  # type: ignore
 
     def test_theme_config_validates_hex_color_format(self):
         """Test that colors must be valid HEX format (#RRGGBB)."""
