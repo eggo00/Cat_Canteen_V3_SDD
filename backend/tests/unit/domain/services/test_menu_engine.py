@@ -1,13 +1,10 @@
 """Unit tests for MenuEngine domain service.
 
 Tests menu JSON validation and slug generation logic.
-
-⚠️ TDD: These tests should FAIL initially until MenuEngine is implemented.
 """
 import pytest
 
 
-@pytest.mark.skip(reason="MenuEngine not yet implemented")
 class TestMenuEngine:
     """Test MenuEngine domain service."""
 

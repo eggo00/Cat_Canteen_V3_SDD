@@ -5,19 +5,8 @@ Represents a restaurant brand in the white-label ordering system.
 import re
 from uuid import UUID, uuid4
 
+from src.domain.exceptions import InvalidSlugError, ValidationError
 from src.domain.value_objects.theme_config import ThemeConfig
-
-
-class ValidationError(ValueError):
-    """Raised when brand validation fails."""
-
-    pass
-
-
-class InvalidSlugError(ValidationError):
-    """Raised when brand slug format is invalid."""
-
-    pass
 
 
 class Brand:

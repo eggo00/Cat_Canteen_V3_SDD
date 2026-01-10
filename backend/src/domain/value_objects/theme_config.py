@@ -6,17 +6,7 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
-
-class ValidationError(ValueError):
-    """Raised when theme configuration validation fails."""
-
-    pass
-
-
-class InvalidColorError(ValidationError):
-    """Raised when color format is invalid."""
-
-    pass
+from src.domain.exceptions import InvalidColorError, ValidationError
 
 
 class LowContrastError(ValidationError):

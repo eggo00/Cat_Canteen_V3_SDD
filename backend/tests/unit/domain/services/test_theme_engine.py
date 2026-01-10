@@ -1,13 +1,10 @@
 """Unit tests for ThemeEngine domain service.
 
 Tests theme validation and color contrast checking.
-
-⚠️ TDD: These tests should FAIL initially until ThemeEngine is implemented.
 """
 import pytest
 
 
-@pytest.mark.skip(reason="ThemeEngine not yet implemented")
 class TestThemeEngine:
     """Test ThemeEngine domain service."""
 
