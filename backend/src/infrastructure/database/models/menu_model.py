@@ -1,7 +1,7 @@
 """SQLAlchemy models for Menu entities (Category, MenuItem, CustomizationOption)."""
 from decimal import Decimal
 
-from sqlalchemy import Boolean, ForeignKey, Integer, Numeric, String, Text
+from sqlalchemy import Boolean, ForeignKey, Integer, JSON, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -101,7 +101,7 @@ class CustomizationOptionModel(Base, UUIDMixin, TimestampMixin):
 
     # Constraints (stored as JSONB for flexibility)
     constraints: Mapped[dict | None] = mapped_column(
-        JSONB,
+        JSON().with_variant(JSONB, "postgresql"),  # PostgreSQL 用 JSONB，其他用 JSON
         nullable=True,
         comment="Constraints like mutually exclusive options",
     )

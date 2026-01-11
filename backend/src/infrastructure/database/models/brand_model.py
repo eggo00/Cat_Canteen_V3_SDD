@@ -1,5 +1,5 @@
 """SQLAlchemy model for Brand entity."""
-from sqlalchemy import Boolean, String, Text
+from sqlalchemy import Boolean, JSON, String, Text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -19,7 +19,7 @@ class BrandModel(Base, UUIDMixin, TimestampMixin):
     # Visual Identity
     logo_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     theme_config: Mapped[dict] = mapped_column(
-        JSONB,
+        JSON().with_variant(JSONB, "postgresql"),  # PostgreSQL 用 JSONB，其他用 JSON
         nullable=False,
         default=dict,
         comment="Theme configuration (colors, fonts, etc.)",

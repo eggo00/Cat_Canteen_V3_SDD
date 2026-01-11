@@ -1,7 +1,7 @@
 """SQLAlchemy models for Order entities."""
 from decimal import Decimal
 
-from sqlalchemy import ForeignKey, Integer, Numeric, String, Text
+from sqlalchemy import ForeignKey, Integer, JSON, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -77,7 +77,7 @@ class OrderItemModel(Base, UUIDMixin, TimestampMixin):
 
     # Customizations (stored as JSONB)
     customizations: Mapped[dict | None] = mapped_column(
-        JSONB,
+        JSON().with_variant(JSONB, "postgresql"),  # PostgreSQL 用 JSONB，其他用 JSON
         nullable=True,
         comment="Customer customizations (toppings, sweetness, etc.)",
     )
