@@ -66,10 +66,9 @@ class MenuItemSchema(BaseSchema):
         examples=[1],
         ge=0,
     )
-    customization_options: list[CustomizationOptionSchema] | None = Field(
-        None,
-        description="List of customization options",
+    customization_options: list[CustomizationOptionSchema] = Field(
         default_factory=list,
+        description="List of customization options",
     )
 
     @field_validator("price")
@@ -116,10 +115,9 @@ class CategorySchema(BaseSchema):
         examples=[1],
         ge=0,
     )
-    menu_items: list[MenuItemSchema] | None = Field(
-        None,
-        description="List of menu items",
+    menu_items: list[MenuItemSchema] = Field(
         default_factory=list,
+        description="List of menu items",
     )
 
 

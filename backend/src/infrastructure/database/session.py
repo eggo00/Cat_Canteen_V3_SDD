@@ -26,16 +26,12 @@ AsyncSessionLocal = async_sessionmaker(
     autoflush=False,
 )
 
-# Sync engine for Alembic migrations
-sync_engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=settings.DEBUG,
-    pool_pre_ping=True,
-)
+# Sync engine for Alembic migrations (derived from async engine)
+sync_engine = async_engine.sync_engine
 
 # Sync session factory
 SessionLocal = sessionmaker(
-    bind=sync_engine.sync_engine,  # type: ignore
+    bind=sync_engine,
     class_=Session,
     expire_on_commit=False,
     autocommit=False,

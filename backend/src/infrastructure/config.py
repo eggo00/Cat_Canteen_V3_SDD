@@ -35,9 +35,10 @@ class Settings(BaseSettings):
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
 
     # CORS
-    ALLOWED_ORIGINS: list[str] = Field(
-        default=["http://localhost:5173", "http://localhost:3000"],
-        description="List of allowed origins",
+    allowed_origins_str: str = Field(
+        default="http://localhost:5173,http://localhost:3000",
+        validation_alias="ALLOWED_ORIGINS",
+        exclude=True,  # Don't include in model dict
     )
 
     # Rate Limiting
@@ -46,26 +47,21 @@ class Settings(BaseSettings):
 
     # File Upload
     MAX_UPLOAD_SIZE_MB: int = 10
-    ALLOWED_IMAGE_TYPES: list[str] = Field(
-        default=["image/jpeg", "image/png", "image/webp"],
-        description="List of allowed image MIME types",
+    allowed_image_types_str: str = Field(
+        default="image/jpeg,image/png,image/webp",
+        validation_alias="ALLOWED_IMAGE_TYPES",
+        exclude=True,  # Don't include in model dict
     )
 
-    @field_validator("ALLOWED_ORIGINS", mode="before")
-    @classmethod
-    def parse_origins(cls, v: str) -> list[str]:
-        """Parse comma-separated origins into a list."""
-        if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
-        return v
+    @property
+    def ALLOWED_ORIGINS(self) -> list[str]:
+        """Parse ALLOWED_ORIGINS from comma-separated string."""
+        return [origin.strip() for origin in self.allowed_origins_str.split(",") if origin.strip()]
 
-    @field_validator("ALLOWED_IMAGE_TYPES", mode="before")
-    @classmethod
-    def parse_image_types(cls, v: str) -> list[str]:
-        """Parse comma-separated image types into a list."""
-        if isinstance(v, str):
-            return [img_type.strip() for img_type in v.split(",")]
-        return v
+    @property
+    def ALLOWED_IMAGE_TYPES(self) -> list[str]:
+        """Parse ALLOWED_IMAGE_TYPES from comma-separated string."""
+        return [img_type.strip() for img_type in self.allowed_image_types_str.split(",") if img_type.strip()]
 
     @property
     def is_production(self) -> bool:

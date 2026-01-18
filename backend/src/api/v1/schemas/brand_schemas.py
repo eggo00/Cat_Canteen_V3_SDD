@@ -125,14 +125,14 @@ class BrandUpdateRequest(BaseSchema):
     )
 
 
-class BrandResponse(IDSchema, TimestampSchema):
+class BrandResponse(IDSchema):
     """Response schema for brand."""
 
     name: str = Field(..., description="Brand name")
     slug: str = Field(..., description="URL-friendly slug")
     description: str | None = Field(None, description="Brand description")
     logo_url: str | None = Field(None, description="Brand logo URL")
-    theme_config: ThemeConfigSchema = Field(..., description="Brand theme configuration")
+    theme_config: dict = Field(..., description="Brand theme configuration")  # Accept dict with any keys
     is_active: bool = Field(..., description="Brand active status")
 
 
