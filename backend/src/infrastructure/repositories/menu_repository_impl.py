@@ -213,7 +213,7 @@ class MenuRepositoryImpl(MenuRepository):
 
             # Create menu items
             menu_items = []
-            for item_data in category_data.get("menuItems", []):
+            for item_data in category_data.get("menu_items", []):
                 menu_item = MenuItem(
                     name=item_data["name"],
                     description=item_data.get("description"),
@@ -235,7 +235,7 @@ class MenuRepositoryImpl(MenuRepository):
 
                 # Create customization options if present
                 customization_options = []
-                for option_data in item_data.get("customizationOptions", []):
+                for option_data in item_data.get("customization_options", []):
                     option = CustomizationOption(
                         option_type=option_data["option_type"],
                         name=option_data["name"],
@@ -299,7 +299,7 @@ class MenuRepositoryImpl(MenuRepository):
                         "description": item.description,
                         "price": float(item.price),
                         "display_order": item.display_order,
-                        "customizationOptions": customization_options_json,
+                        "customization_options": customization_options_json,
                     }
                 )
 
@@ -309,7 +309,7 @@ class MenuRepositoryImpl(MenuRepository):
                     "name": category.name,
                     "description": category.description,
                     "display_order": category.display_order,
-                    "menuItems": menu_items_json,
+                    "menu_items": menu_items_json,
                 }
             )
 

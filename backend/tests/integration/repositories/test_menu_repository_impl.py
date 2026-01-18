@@ -39,7 +39,7 @@ class TestMenuRepositoryImpl:
                     "name": "飲料",
                     "description": "各式飲品",
                     "display_order": 1,
-                    "menuItems": [
+                    "menu_items": [
                         {
                             "name": "美式咖啡",
                             "description": "香醇美式咖啡",
@@ -58,7 +58,7 @@ class TestMenuRepositoryImpl:
                     "name": "甜點",
                     "description": "美味甜點",
                     "display_order": 2,
-                    "menuItems": [
+                    "menu_items": [
                         {
                             "name": "提拉米蘇",
                             "price": 150.00,
@@ -98,7 +98,7 @@ class TestMenuRepositoryImpl:
                 {
                     "name": "舊分類",
                     "display_order": 1,
-                    "menuItems": [
+                    "menu_items": [
                         {"name": "舊品項", "price": 50.00, "display_order": 1}
                     ],
                 }
@@ -112,7 +112,7 @@ class TestMenuRepositoryImpl:
                 {
                     "name": "新分類",
                     "display_order": 1,
-                    "menuItems": [
+                    "menu_items": [
                         {"name": "新品項", "price": 100.00, "display_order": 1}
                     ],
                 }
@@ -146,7 +146,7 @@ class TestMenuRepositoryImpl:
                     "name": "飲料",
                     "description": "各式飲品",
                     "display_order": 1,
-                    "menuItems": [
+                    "menu_items": [
                         {
                             "name": "美式咖啡",
                             "description": "香醇美式咖啡",
@@ -167,8 +167,8 @@ class TestMenuRepositoryImpl:
         assert len(result["categories"]) == 1
         assert result["categories"][0]["name"] == "飲料"
         assert result["categories"][0]["description"] == "各式飲品"
-        assert len(result["categories"][0]["menuItems"]) == 1
-        assert result["categories"][0]["menuItems"][0]["name"] == "美式咖啡"
+        assert len(result["categories"][0]["menu_items"]) == 1
+        assert result["categories"][0]["menu_items"][0]["name"] == "美式咖啡"
 
     async def test_get_full_menu_empty(self, async_session, sample_brand):
         """Test getting menu when no menu exists."""

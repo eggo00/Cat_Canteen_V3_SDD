@@ -23,6 +23,33 @@ from src.infrastructure.repositories.brand_repository_impl import BrandRepositor
 router = APIRouter(prefix="/brands", tags=["Brands"])
 
 
+# Helper functions for theme_config naming conversion
+def to_camel_case(theme_config: dict) -> dict:
+    """Convert theme_config from snake_case to camelCase for domain layer."""
+    mapping = {
+        "primary_color": "primaryColor",
+        "secondary_color": "secondaryColor",
+        "accent_color": "accentColor",
+        "background_color": "backgroundColor",
+        "text_color": "textColor",
+        "font_family": "fontFamily",
+    }
+    return {mapping.get(k, k): v for k, v in theme_config.items() if v is not None}
+
+
+def to_snake_case(theme_config: dict) -> dict:
+    """Convert theme_config from camelCase to snake_case for API response."""
+    mapping = {
+        "primaryColor": "primary_color",
+        "secondaryColor": "secondary_color",
+        "accentColor": "accent_color",
+        "backgroundColor": "background_color",
+        "textColor": "text_color",
+        "fontFamily": "font_family",
+    }
+    return {mapping.get(k, k): v for k, v in theme_config.items() if v is not None}
+
+
 # Dependency to get brand repository
 async def get_brand_repository(
     session: Annotated[AsyncSession, Depends(get_async_session)],
@@ -68,20 +95,23 @@ async def create_brand(
             theme_engine=theme_engine,
         )
 
-        # Execute use case
-        brand = await use_case.execute(request.model_dump(exclude_none=True))
+        # Prepare brand data and convert theme_config to camelCase
+        brand_data = request.model_dump(exclude_none=True)
+        if "theme_config" in brand_data:
+            brand_data["theme_config"] = to_camel_case(brand_data["theme_config"])
 
-        # Convert to response
+        # Execute use case
+        brand = await use_case.execute(brand_data)
+
+        # Convert to response (convert theme_config back to snake_case)
         return BrandResponse(
             id=brand.id,
             name=brand.name,
             slug=brand.slug,
             description=brand.description,
             logo_url=brand.logo_url,
-            theme_config=brand.theme_config.to_dict(),
+            theme_config=to_snake_case(brand.theme_config.to_dict()),
             is_active=brand.is_active,
-            created_at=brand.created_at if hasattr(brand, "created_at") else None,
-            updated_at=brand.updated_at if hasattr(brand, "updated_at") else None,
         )
 
     except ValidationError as e:
@@ -129,17 +159,22 @@ async def get_brand_by_slug(
         # Execute use case
         brand = await use_case.execute(slug)
 
-        # Convert to response
+        # Check if brand was found
+        if brand is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Brand not found: {slug}",
+            )
+
+        # Convert to response (convert theme_config to snake_case)
         return BrandResponse(
             id=brand.id,
             name=brand.name,
             slug=brand.slug,
             description=brand.description,
             logo_url=brand.logo_url,
-            theme_config=brand.theme_config.to_dict(),
+            theme_config=to_snake_case(brand.theme_config.to_dict()),
             is_active=brand.is_active,
-            created_at=brand.created_at if hasattr(brand, "created_at") else None,
-            updated_at=brand.updated_at if hasattr(brand, "updated_at") else None,
         )
 
     except NotFoundError as e:
@@ -183,17 +218,15 @@ async def get_brand_by_id(
             detail=f"Brand not found: {brand_id}",
         )
 
-    # Convert to response
+    # Convert to response (convert theme_config to snake_case)
     return BrandResponse(
         id=brand.id,
         name=brand.name,
         slug=brand.slug,
         description=brand.description,
         logo_url=brand.logo_url,
-        theme_config=brand.theme_config.to_dict(),
+        theme_config=to_snake_case(brand.theme_config.to_dict()),
         is_active=brand.is_active,
-        created_at=brand.created_at if hasattr(brand, "created_at") else None,
-        updated_at=brand.updated_at if hasattr(brand, "updated_at") else None,
     )
 
 
@@ -229,7 +262,7 @@ async def list_brands(
     else:
         brands = await repository.get_all(skip=skip, limit=limit)
 
-    # Convert to response
+    # Convert to response (convert theme_config to snake_case)
     return [
         BrandResponse(
             id=brand.id,
@@ -237,10 +270,8 @@ async def list_brands(
             slug=brand.slug,
             description=brand.description,
             logo_url=brand.logo_url,
-            theme_config=brand.theme_config.to_dict(),
+            theme_config=to_snake_case(brand.theme_config.to_dict()),
             is_active=brand.is_active,
-            created_at=brand.created_at if hasattr(brand, "created_at") else None,
-            updated_at=brand.updated_at if hasattr(brand, "updated_at") else None,
         )
         for brand in brands
     ]
@@ -294,7 +325,8 @@ async def update_brand(
         if "logo_url" in update_data:
             brand.logo_url = update_data["logo_url"]
         if "theme_config" in update_data:
-            brand.theme_config = update_data["theme_config"]
+            # Convert theme_config to camelCase and use update_theme method
+            brand.update_theme(to_camel_case(update_data["theme_config"]))
         if "is_active" in update_data:
             if update_data["is_active"]:
                 brand.activate()
@@ -304,17 +336,15 @@ async def update_brand(
         # Update in database
         updated_brand = await repository.update(brand)
 
-        # Convert to response
+        # Convert to response (convert theme_config to snake_case)
         return BrandResponse(
             id=updated_brand.id,
             name=updated_brand.name,
             slug=updated_brand.slug,
             description=updated_brand.description,
             logo_url=updated_brand.logo_url,
-            theme_config=updated_brand.theme_config.to_dict(),
+            theme_config=to_snake_case(updated_brand.theme_config.to_dict()),
             is_active=updated_brand.is_active,
-            created_at=updated_brand.created_at if hasattr(updated_brand, "created_at") else None,
-            updated_at=updated_brand.updated_at if hasattr(updated_brand, "updated_at") else None,
         )
 
     except ValidationError as e:
