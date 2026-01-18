@@ -104,6 +104,9 @@ class SuccessResponse(BaseSchema):
     data: dict | None = Field(None, description="Optional response data")
 
 
+from .brand_schemas import *  # noqa: F401, F403
+from .menu_schemas import *  # noqa: F401, F403
+
 __all__ = [
     "BaseSchema",
     "TimestampSchema",

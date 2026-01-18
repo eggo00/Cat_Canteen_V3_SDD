@@ -35,9 +35,9 @@ class Settings(BaseSettings):
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
 
     # CORS
-    ALLOWED_ORIGINS: str = Field(
-        default="http://localhost:5173,http://localhost:3000",
-        description="Comma-separated list of allowed origins",
+    ALLOWED_ORIGINS: list[str] = Field(
+        default=["http://localhost:5173", "http://localhost:3000"],
+        description="List of allowed origins",
     )
 
     # Rate Limiting
@@ -46,7 +46,10 @@ class Settings(BaseSettings):
 
     # File Upload
     MAX_UPLOAD_SIZE_MB: int = 10
-    ALLOWED_IMAGE_TYPES: str = "image/jpeg,image/png,image/webp"
+    ALLOWED_IMAGE_TYPES: list[str] = Field(
+        default=["image/jpeg", "image/png", "image/webp"],
+        description="List of allowed image MIME types",
+    )
 
     @field_validator("ALLOWED_ORIGINS", mode="before")
     @classmethod
