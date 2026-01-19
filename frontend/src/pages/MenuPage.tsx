@@ -3,10 +3,11 @@
  * Main menu page with brand theme and menu display
  */
 
-import React, { useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useCallback, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useBrandTheme } from '../features/brand/hooks/useBrandTheme';
 import { useMenu } from '../features/menu/hooks/useMenu';
+import { useCart } from '../features/cart/hooks/useCart';
 import { MenuList, CategoryFilter } from '../features/menu/components';
 import { MenuItem as MenuItemType } from '../shared/types/menu';
 
@@ -131,13 +132,59 @@ function LoadingDisplay(): JSX.Element {
 }
 
 /**
+ * Floating cart button component
+ */
+function FloatingCartButton({
+  itemCount,
+  subtotal,
+  onClick,
+}: {
+  itemCount: number;
+  subtotal: number;
+  onClick: () => void;
+}): JSX.Element | null {
+  if (itemCount === 0) {
+    return null;
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      className="fixed bottom-6 right-6 flex items-center gap-3 rounded-full px-6 py-3 text-white shadow-lg transition-transform hover:scale-105 z-50"
+      style={{ backgroundColor: 'var(--color-primary, #FF6B6B)' }}
+    >
+      <div className="relative">
+        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+          />
+        </svg>
+        <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold"
+          style={{ color: 'var(--color-primary, #FF6B6B)' }}
+        >
+          {itemCount}
+        </span>
+      </div>
+      <span className="font-semibold">NT$ {subtotal.toFixed(0)}</span>
+    </button>
+  );
+}
+
+/**
  * MenuPage component
  */
 export function MenuPage(): JSX.Element {
-  const { slug } = useParams<{ slug: string }>();
+  const { brandSlug } = useParams<{ brandSlug: string }>();
+  const navigate = useNavigate();
 
   // Fetch brand data and apply theme
-  const { brand, isLoading: brandLoading, error: brandError } = useBrandTheme(slug);
+  const { brand, isLoading: brandLoading, error: brandError } = useBrandTheme(brandSlug);
+
+  // Cart state
+  const { addItem, itemCount, subtotal, setBrand } = useCart();
 
   // Fetch menu data
   const {
@@ -151,11 +198,22 @@ export function MenuPage(): JSX.Element {
     setSearchTerm,
   } = useMenu(brand?.id);
 
-  // Handle add to cart (placeholder for now)
+  // Set brand in cart when brand loads
+  useEffect(() => {
+    if (brand && brandSlug) {
+      setBrand(brand.id, brandSlug);
+    }
+  }, [brand, brandSlug, setBrand]);
+
+  // Handle add to cart
   const handleAddToCart = useCallback((item: MenuItemType) => {
-    console.log('Add to cart:', item);
-    // TODO: Implement cart functionality in Phase 4
-  }, []);
+    addItem(item, 1);
+  }, [addItem]);
+
+  // Handle go to cart
+  const handleGoToCart = useCallback(() => {
+    navigate(`/${brandSlug}/cart`);
+  }, [navigate, brandSlug]);
 
   // Loading state
   if (brandLoading) {
@@ -218,6 +276,13 @@ export function MenuPage(): JSX.Element {
           )}
         </div>
       </div>
+
+      {/* Floating cart button */}
+      <FloatingCartButton
+        itemCount={itemCount}
+        subtotal={subtotal}
+        onClick={handleGoToCart}
+      />
     </div>
   );
 }

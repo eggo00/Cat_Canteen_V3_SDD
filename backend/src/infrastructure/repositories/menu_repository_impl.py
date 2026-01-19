@@ -359,6 +359,28 @@ class MenuRepositoryImpl(MenuRepository):
 
         return True
 
+    async def get_menu_item_by_id(self, item_id: UUID) -> MenuItem | None:
+        """Get menu item by ID.
+
+        Args:
+            item_id: Menu item UUID
+
+        Returns:
+            MenuItem if found, None otherwise
+        """
+        stmt = (
+            select(MenuItemModel)
+            .options(selectinload(MenuItemModel.customization_options))
+            .where(MenuItemModel.id == item_id)
+        )
+        result = await self.session.execute(stmt)
+        model = result.scalar_one_or_none()
+
+        if not model:
+            return None
+
+        return self._menu_item_to_entity(model)
+
     def _category_to_entity(
         self, model: CategoryModel, include_items: bool = True
     ) -> Category:

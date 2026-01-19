@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 
 from src.domain.entities.category import Category
+from src.domain.entities.menu_item import MenuItem
 
 
 class MenuRepository(ABC):
@@ -134,5 +135,17 @@ class MenuRepository(ABC):
         Raises:
             NotFoundError: If brand or any category not found
             ValidationError: If category list is invalid
+        """
+        pass
+
+    @abstractmethod
+    async def get_menu_item_by_id(self, item_id: UUID) -> MenuItem | None:
+        """Get menu item by ID.
+
+        Args:
+            item_id: Menu item UUID
+
+        Returns:
+            MenuItem if found, None otherwise
         """
         pass

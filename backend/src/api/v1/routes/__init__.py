@@ -2,15 +2,15 @@
 
 All API route modules will be imported here and included in the main app.
 """
-from . import brands, menus
+from . import brands, menus, orders
 
 # Future router modules will be imported here as they are created
-# from . import orders, auth, analytics, ai
+# from . import auth, analytics, ai
 
 __all__ = [
     "brands",
     "menus",
-    # "orders",
+    "orders",
     # "auth",
     # "analytics",
     # "ai",

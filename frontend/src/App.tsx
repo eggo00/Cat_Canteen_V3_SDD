@@ -7,6 +7,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from './theme/ThemeProvider';
 import { MenuPage } from './pages/MenuPage';
+import { CartPage } from './pages/CartPage';
+import { CheckoutPage } from './pages/CheckoutPage';
+import { OrderStatusPage } from './pages/OrderStatusPage';
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -69,11 +72,14 @@ function App(): JSX.Element {
             {/* Home page */}
             <Route path="/" element={<HomePage />} />
 
-            {/* Brand menu page - with dynamic theme loading */}
-            <Route path="/brand/:slug" element={<MenuPage />} />
+            {/* Brand routes - with dynamic theme loading */}
+            <Route path="/:brandSlug/menu" element={<MenuPage />} />
+            <Route path="/:brandSlug/cart" element={<CartPage />} />
+            <Route path="/:brandSlug/checkout" element={<CheckoutPage />} />
+            <Route path="/:brandSlug/order/:orderNumber" element={<OrderStatusPage />} />
 
-            {/* Legacy route support */}
-            <Route path="/:slug" element={<Navigate to="/brand/:slug" replace />} />
+            {/* Legacy route support - redirect old brand URL to menu */}
+            <Route path="/brand/:slug" element={<Navigate to="/:slug/menu" replace />} />
 
             {/* 404 Not Found */}
             <Route path="*" element={<NotFoundPage />} />

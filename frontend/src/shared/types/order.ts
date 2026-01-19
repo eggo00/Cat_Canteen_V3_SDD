@@ -2,7 +2,16 @@
  * Order-related TypeScript types
  */
 
-export type OrderStatus = 'pending' | 'preparing' | 'completed' | 'cancelled';
+export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'completed' | 'cancelled';
+
+export const ORDER_STATUS_DISPLAY: Record<OrderStatus, string> = {
+  pending: '待確認',
+  confirmed: '已確認',
+  preparing: '製作中',
+  ready: '已完成',
+  completed: '已取餐',
+  cancelled: '已取消',
+};
 
 export interface OrderCustomization {
   optionType: string;

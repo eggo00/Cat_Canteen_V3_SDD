@@ -105,14 +105,14 @@ async def root():
 
 
 # Include API v1 routes
-from src.api.v1.routes import brands, menus
+from src.api.v1.routes import brands, menus, orders
 
 app.include_router(brands.router, prefix="/v1")
 app.include_router(menus.router, prefix="/v1")
+app.include_router(orders.router, prefix="/v1")
 
 # Future routes (will be added later)
-# from src.api.v1.routes import orders, auth, analytics, ai
-# app.include_router(orders.router, prefix="/v1", tags=["Orders"])
+# from src.api.v1.routes import auth, analytics, ai
 # app.include_router(auth.router, prefix="/v1", tags=["Authentication"])
 # app.include_router(analytics.router, prefix="/v1", tags=["Analytics"])
 # app.include_router(ai.router, prefix="/v1", tags=["AI"])
