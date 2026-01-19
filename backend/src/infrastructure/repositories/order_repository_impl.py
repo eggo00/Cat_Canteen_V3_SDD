@@ -3,10 +3,11 @@
 SQLAlchemy-based implementation of the OrderRepository interface.
 """
 
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from uuid import UUID
 
-from sqlalchemy import and_, select
+from sqlalchemy import and_, cast, Date, extract, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -381,3 +382,174 @@ class OrderRepositoryImpl(OrderRepository):
         models = result.scalars().all()
 
         return [self._to_domain(model) for model in models]
+
+    # ==================== Analytics Methods ====================
+
+    async def get_revenue_by_date_range(
+        self,
+        brand_id: UUID,
+        start_date: date,
+        end_date: date,
+        statuses: list[OrderStatus],
+    ) -> list[dict]:
+        """Get revenue aggregated by date.
+
+        Args:
+            brand_id: Brand identifier
+            start_date: Start of date range
+            end_date: End of date range
+            statuses: Order statuses to include
+
+        Returns:
+            list[dict]: List of dicts with 'date', 'revenue', 'order_count'
+        """
+        # Convert date range to datetime for comparison
+        start_datetime = datetime.combine(start_date, datetime.min.time())
+        end_datetime = datetime.combine(end_date, datetime.max.time())
+
+        status_values = [s.value for s in statuses]
+
+        query = (
+            select(
+                cast(OrderModel.created_at, Date).label("order_date"),
+                func.sum(OrderModel.total_amount).label("revenue"),
+                func.count(OrderModel.id).label("order_count"),
+            )
+            .where(
+                and_(
+                    OrderModel.brand_id == brand_id,
+                    OrderModel.created_at >= start_datetime,
+                    OrderModel.created_at <= end_datetime,
+                    OrderModel.status.in_(status_values),
+                )
+            )
+            .group_by(cast(OrderModel.created_at, Date))
+            .order_by(cast(OrderModel.created_at, Date))
+        )
+
+        result = await self.session.execute(query)
+        rows = result.all()
+
+        return [
+            {
+                "date": row.order_date,
+                "revenue": float(row.revenue or 0),
+                "order_count": row.order_count,
+            }
+            for row in rows
+        ]
+
+    async def get_top_items_by_date_range(
+        self,
+        brand_id: UUID,
+        start_date: date,
+        end_date: date,
+        statuses: list[OrderStatus],
+        limit: int = 10,
+    ) -> list[dict]:
+        """Get top-selling items aggregated by quantity.
+
+        Args:
+            brand_id: Brand identifier
+            start_date: Start of date range
+            end_date: End of date range
+            statuses: Order statuses to include
+            limit: Maximum number of items to return
+
+        Returns:
+            list[dict]: List of dicts with 'menu_item_id', 'menu_item_name',
+                       'quantity_sold', 'total_revenue'
+        """
+        # Convert date range to datetime for comparison
+        start_datetime = datetime.combine(start_date, datetime.min.time())
+        end_datetime = datetime.combine(end_date, datetime.max.time())
+
+        status_values = [s.value for s in statuses]
+
+        query = (
+            select(
+                OrderItemModel.menu_item_id,
+                OrderItemModel.menu_item_name,
+                func.sum(OrderItemModel.quantity).label("quantity_sold"),
+                func.sum(OrderItemModel.subtotal).label("total_revenue"),
+            )
+            .join(OrderModel, OrderItemModel.order_id == OrderModel.id)
+            .where(
+                and_(
+                    OrderModel.brand_id == brand_id,
+                    OrderModel.created_at >= start_datetime,
+                    OrderModel.created_at <= end_datetime,
+                    OrderModel.status.in_(status_values),
+                )
+            )
+            .group_by(OrderItemModel.menu_item_id, OrderItemModel.menu_item_name)
+            .order_by(func.sum(OrderItemModel.quantity).desc())
+            .limit(limit)
+        )
+
+        result = await self.session.execute(query)
+        rows = result.all()
+
+        return [
+            {
+                "menu_item_id": row.menu_item_id,
+                "menu_item_name": row.menu_item_name,
+                "quantity_sold": row.quantity_sold,
+                "total_revenue": float(row.total_revenue or 0),
+            }
+            for row in rows
+        ]
+
+    async def get_orders_by_hour(
+        self,
+        brand_id: UUID,
+        start_date: date,
+        end_date: date,
+        statuses: list[OrderStatus],
+    ) -> list[dict]:
+        """Get order distribution by hour of day.
+
+        Args:
+            brand_id: Brand identifier
+            start_date: Start of date range
+            end_date: End of date range
+            statuses: Order statuses to include
+
+        Returns:
+            list[dict]: List of dicts with 'hour' (0-23), 'order_count', 'total_revenue'
+        """
+        # Convert date range to datetime for comparison
+        start_datetime = datetime.combine(start_date, datetime.min.time())
+        end_datetime = datetime.combine(end_date, datetime.max.time())
+
+        status_values = [s.value for s in statuses]
+
+        query = (
+            select(
+                extract("hour", OrderModel.created_at).label("hour"),
+                func.count(OrderModel.id).label("order_count"),
+                func.sum(OrderModel.total_amount).label("total_revenue"),
+            )
+            .where(
+                and_(
+                    OrderModel.brand_id == brand_id,
+                    OrderModel.created_at >= start_datetime,
+                    OrderModel.created_at <= end_datetime,
+                    OrderModel.status.in_(status_values),
+                )
+            )
+            .group_by(extract("hour", OrderModel.created_at))
+            .order_by(extract("hour", OrderModel.created_at))
+        )
+
+        result = await self.session.execute(query)
+        rows = result.all()
+
+        return [
+            {
+                "hour": int(row.hour),
+                "order_count": row.order_count,
+                "total_revenue": float(row.total_revenue or 0),
+            }
+            for row in rows
+        ]

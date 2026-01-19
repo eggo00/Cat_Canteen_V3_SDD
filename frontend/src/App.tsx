@@ -10,6 +10,7 @@ import { MenuPage } from './pages/MenuPage';
 import { CartPage } from './pages/CartPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { OrderStatusPage } from './pages/OrderStatusPage';
+import { AnalyticsPage } from './pages/AnalyticsPage';
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -77,6 +78,7 @@ function App(): JSX.Element {
             <Route path="/:brandSlug/cart" element={<CartPage />} />
             <Route path="/:brandSlug/checkout" element={<CheckoutPage />} />
             <Route path="/:brandSlug/order/:orderNumber" element={<OrderStatusPage />} />
+            <Route path="/:brandSlug/analytics" element={<AnalyticsPage />} />
 
             {/* Legacy route support - redirect old brand URL to menu */}
             <Route path="/brand/:slug" element={<Navigate to="/:slug/menu" replace />} />

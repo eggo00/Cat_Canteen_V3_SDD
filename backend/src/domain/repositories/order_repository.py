@@ -4,6 +4,7 @@ Defines the abstract interface for order persistence operations.
 """
 
 from abc import ABC, abstractmethod
+from datetime import date
 from uuid import UUID
 
 from src.domain.entities.order import Order
@@ -161,5 +162,73 @@ class OrderRepository(ABC):
 
         Returns:
             list[Order]: List of active orders
+        """
+        pass
+
+    # ==================== Analytics Methods ====================
+
+    @abstractmethod
+    async def get_revenue_by_date_range(
+        self,
+        brand_id: UUID,
+        start_date: date,
+        end_date: date,
+        statuses: list[OrderStatus],
+    ) -> list[dict]:
+        """Get revenue aggregated by date.
+
+        Args:
+            brand_id: Brand identifier
+            start_date: Start of date range
+            end_date: End of date range
+            statuses: Order statuses to include
+
+        Returns:
+            list[dict]: List of dicts with 'date', 'revenue', 'order_count'
+        """
+        pass
+
+    @abstractmethod
+    async def get_top_items_by_date_range(
+        self,
+        brand_id: UUID,
+        start_date: date,
+        end_date: date,
+        statuses: list[OrderStatus],
+        limit: int = 10,
+    ) -> list[dict]:
+        """Get top-selling items aggregated by quantity.
+
+        Args:
+            brand_id: Brand identifier
+            start_date: Start of date range
+            end_date: End of date range
+            statuses: Order statuses to include
+            limit: Maximum number of items to return
+
+        Returns:
+            list[dict]: List of dicts with 'menu_item_id', 'menu_item_name',
+                       'quantity_sold', 'total_revenue'
+        """
+        pass
+
+    @abstractmethod
+    async def get_orders_by_hour(
+        self,
+        brand_id: UUID,
+        start_date: date,
+        end_date: date,
+        statuses: list[OrderStatus],
+    ) -> list[dict]:
+        """Get order distribution by hour of day.
+
+        Args:
+            brand_id: Brand identifier
+            start_date: Start of date range
+            end_date: End of date range
+            statuses: Order statuses to include
+
+        Returns:
+            list[dict]: List of dicts with 'hour' (0-23), 'order_count', 'total_revenue'
         """
         pass
