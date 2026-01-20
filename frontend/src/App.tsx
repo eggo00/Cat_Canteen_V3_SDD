@@ -11,6 +11,8 @@ import { CartPage } from './pages/CartPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { OrderStatusPage } from './pages/OrderStatusPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
+import LoginPage from './pages/LoginPage';
+import { AdminRoute } from './features/auth';
 
 // Create a client for React Query
 const queryClient = new QueryClient({
@@ -62,6 +64,26 @@ function NotFoundPage(): JSX.Element {
 }
 
 /**
+ * Unauthorized page
+ */
+function UnauthorizedPage(): JSX.Element {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <h1 className="text-6xl font-bold text-gray-300">403</h1>
+        <p className="mt-4 text-xl text-gray-600">沒有權限訪問此頁面</p>
+        <a
+          href="/"
+          className="mt-6 inline-block rounded-lg bg-blue-500 px-6 py-2 text-white hover:bg-blue-600"
+        >
+          返回首頁
+        </a>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Main App component
  */
 function App(): JSX.Element {
@@ -73,12 +95,25 @@ function App(): JSX.Element {
             {/* Home page */}
             <Route path="/" element={<HomePage />} />
 
+            {/* Auth routes */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
             {/* Brand routes - with dynamic theme loading */}
             <Route path="/:brandSlug/menu" element={<MenuPage />} />
             <Route path="/:brandSlug/cart" element={<CartPage />} />
             <Route path="/:brandSlug/checkout" element={<CheckoutPage />} />
             <Route path="/:brandSlug/order/:orderNumber" element={<OrderStatusPage />} />
-            <Route path="/:brandSlug/analytics" element={<AnalyticsPage />} />
+
+            {/* Admin routes - protected */}
+            <Route
+              path="/:brandSlug/analytics"
+              element={
+                <AdminRoute>
+                  <AnalyticsPage />
+                </AdminRoute>
+              }
+            />
 
             {/* Legacy route support - redirect old brand URL to menu */}
             <Route path="/brand/:slug" element={<Navigate to="/:slug/menu" replace />} />

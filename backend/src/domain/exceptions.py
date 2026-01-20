@@ -85,3 +85,57 @@ class BusinessRuleViolationError(DomainError):
     """Raised when a business rule is violated."""
 
     pass
+
+
+class AuthenticationError(DomainError):
+    """Raised when authentication fails."""
+
+    pass
+
+
+class InvalidCredentialsError(AuthenticationError):
+    """Raised when login credentials are invalid."""
+
+    def __init__(self) -> None:
+        """Initialize InvalidCredentialsError."""
+        super().__init__("Invalid email or password")
+
+
+class UnauthorizedError(AuthenticationError):
+    """Raised when user lacks permission for an action."""
+
+    def __init__(self, message: str = "Unauthorized access") -> None:
+        """Initialize UnauthorizedError.
+
+        Args:
+            message: Error message
+        """
+        super().__init__(message)
+
+
+class TokenExpiredError(AuthenticationError):
+    """Raised when JWT token has expired."""
+
+    def __init__(self) -> None:
+        """Initialize TokenExpiredError."""
+        super().__init__("Token has expired")
+
+
+class InvalidTokenError(AuthenticationError):
+    """Raised when JWT token is invalid."""
+
+    def __init__(self) -> None:
+        """Initialize InvalidTokenError."""
+        super().__init__("Invalid token")
+
+
+class DuplicateEmailError(DuplicateError):
+    """Raised when attempting to create a user with duplicate email."""
+
+    def __init__(self, email: str) -> None:
+        """Initialize DuplicateEmailError.
+
+        Args:
+            email: Duplicate email value
+        """
+        super().__init__("User", "email", email)
