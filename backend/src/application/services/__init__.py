@@ -8,10 +8,28 @@ from src.application.services.auth_service import (
     TokenPair,
     TokenPayload,
 )
+from src.application.services.ai_service import (
+    AIService,
+    AIServiceProtocol,
+    DemandForecastResult,
+    DemandPrediction,
+    RecommendationItem,
+    RecommendationResult,
+    UserPreference,
+)
 
 __all__ = [
+    # Auth
     "JWTHandlerProtocol",
     "PasswordHasherProtocol",
     "TokenPair",
     "TokenPayload",
+    # AI
+    "AIService",
+    "AIServiceProtocol",
+    "DemandForecastResult",
+    "DemandPrediction",
+    "RecommendationItem",
+    "RecommendationResult",
+    "UserPreference",
 ]

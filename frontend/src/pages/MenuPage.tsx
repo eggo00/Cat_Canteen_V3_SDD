@@ -9,6 +9,7 @@ import { useBrandTheme } from '../features/brand/hooks/useBrandTheme';
 import { useMenu } from '../features/menu/hooks/useMenu';
 import { useCart } from '../features/cart/hooks/useCart';
 import { MenuList, CategoryFilter } from '../features/menu/components';
+import { RecommendedItems } from '../features/ai';
 import { MenuItem as MenuItemType } from '../shared/types/menu';
 
 /**
@@ -245,6 +246,25 @@ export function MenuPage(): JSX.Element {
           description={brand.description}
           logoUrl={brand.logoUrl}
         />
+
+        {/* AI-powered recommendations */}
+        {brandSlug && (
+          <div className="mt-6">
+            <RecommendedItems
+              brandSlug={brandSlug}
+              limit={4}
+              onItemClick={(item) => {
+                // Find and add the item to cart
+                const menuItem = filteredItems.find(
+                  (mi) => mi.id === item.itemId
+                );
+                if (menuItem) {
+                  handleAddToCart(menuItem);
+                }
+              }}
+            />
+          </div>
+        )}
 
         {/* Search and filters */}
         <div className="mt-6 space-y-4">
