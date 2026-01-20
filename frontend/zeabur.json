@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/zeabur",
+  "build": {
+    "type": "dockerfile",
+    "dockerfile": "Dockerfile"
+  },
+  "expose": {
+    "port": 3000
+  }
+}
