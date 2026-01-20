@@ -1,6 +1,7 @@
 """FastAPI main application entry point."""
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import Any
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,8 +13,9 @@ from src.api.v1.middleware import (
     RateLimitMiddleware,
     RequestLoggingMiddleware,
 )
+from src.api.v1.routes import ai, analytics, auth, brands, menus, orders
 from src.infrastructure.config import settings
-from src.infrastructure.database.session import close_db, init_db
+from src.infrastructure.database.session import close_db
 
 
 @asynccontextmanager
@@ -74,11 +76,11 @@ if settings.is_production:
 
 # Health check endpoint
 @app.get("/health", tags=["Health"])
-async def health_check():
+async def health_check() -> JSONResponse:
     """Health check endpoint for load balancers and monitoring.
 
     Returns:
-        dict: Health status information
+        JSONResponse: Health status information
     """
     return JSONResponse(
         content={
@@ -91,7 +93,7 @@ async def health_check():
 
 # Root endpoint
 @app.get("/", tags=["Root"])
-async def root():
+async def root() -> dict[str, Any]:
     """Root endpoint with API information.
 
     Returns:
@@ -105,8 +107,6 @@ async def root():
 
 
 # Include API v1 routes
-from src.api.v1.routes import ai, analytics, auth, brands, menus, orders
-
 app.include_router(auth.router, prefix="/v1")
 app.include_router(ai.router, prefix="/v1")
 app.include_router(analytics.router, prefix="/v1")

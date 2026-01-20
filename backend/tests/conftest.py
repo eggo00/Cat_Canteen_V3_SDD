@@ -8,7 +8,19 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Session, sessionmaker
 
+from src.infrastructure.cache import get_cache
 from src.infrastructure.database.models import Base
+
+
+@pytest.fixture(autouse=True)
+def clear_cache():
+    """Clear the cache before each test to prevent state leakage."""
+    cache = get_cache()
+    # Clear cache synchronously by resetting the cache dict
+    cache._cache.clear()
+    yield
+    # Clear cache after test as well
+    cache._cache.clear()
 
 # Test database URL (use SQLite for fast tests)
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"

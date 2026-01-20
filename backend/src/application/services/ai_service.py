@@ -5,7 +5,7 @@ Concrete implementations are provided in the infrastructure layer.
 This is a stub interface for future AI/ML model integration.
 """
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date
 from typing import Protocol
 from uuid import UUID

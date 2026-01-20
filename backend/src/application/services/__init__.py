@@ -2,12 +2,6 @@
 
 Service protocols define contracts for infrastructure implementations.
 """
-from src.application.services.auth_service import (
-    JWTHandlerProtocol,
-    PasswordHasherProtocol,
-    TokenPair,
-    TokenPayload,
-)
 from src.application.services.ai_service import (
     AIService,
     AIServiceProtocol,
@@ -16,6 +10,12 @@ from src.application.services.ai_service import (
     RecommendationItem,
     RecommendationResult,
     UserPreference,
+)
+from src.application.services.auth_service import (
+    JWTHandlerProtocol,
+    PasswordHasherProtocol,
+    TokenPair,
+    TokenPayload,
 )
 
 __all__ = [

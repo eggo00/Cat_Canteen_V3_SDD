@@ -6,6 +6,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from './theme/ThemeProvider';
+import { ErrorBoundary } from './shared/components';
 import { MenuPage } from './pages/MenuPage';
 import { CartPage } from './pages/CartPage';
 import { CheckoutPage } from './pages/CheckoutPage';
@@ -88,10 +89,11 @@ function UnauthorizedPage(): JSX.Element {
  */
 function App(): JSX.Element {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <BrowserRouter>
-          <Routes>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <BrowserRouter>
+            <Routes>
             {/* Home page */}
             <Route path="/" element={<HomePage />} />
 
@@ -120,10 +122,11 @@ function App(): JSX.Element {
 
             {/* 404 Not Found */}
             <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </BrowserRouter>
-      </ThemeProvider>
-    </QueryClientProvider>
+            </Routes>
+          </BrowserRouter>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

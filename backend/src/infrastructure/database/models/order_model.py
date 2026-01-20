@@ -1,7 +1,7 @@
 """SQLAlchemy models for Order entities."""
 from decimal import Decimal
 
-from sqlalchemy import ForeignKey, Integer, JSON, Numeric, String, Text
+from sqlalchemy import JSON, ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

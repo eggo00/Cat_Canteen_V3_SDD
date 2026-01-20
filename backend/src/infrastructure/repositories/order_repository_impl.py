@@ -3,11 +3,10 @@
 SQLAlchemy-based implementation of the OrderRepository interface.
 """
 
-from datetime import date, datetime, timedelta
-from decimal import Decimal
+from datetime import date, datetime
 from uuid import UUID
 
-from sqlalchemy import and_, cast, Date, extract, func, select
+from sqlalchemy import Date, and_, cast, extract, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 

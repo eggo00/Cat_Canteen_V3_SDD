@@ -2,10 +2,10 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.v1.dependencies import CurrentUser, AdminUser, SuperAdminUser
+from src.api.v1.dependencies import AdminUser, CurrentUser
 from src.api.v1.schemas.auth_schemas import (
     LoginRequest,
     LoginResponse,
@@ -14,7 +14,6 @@ from src.api.v1.schemas.auth_schemas import (
     TokenResponse,
     UserCreateRequest,
     UserResponse,
-    UserUpdateRequest,
 )
 from src.application.use_cases.auth.login import Login
 from src.application.use_cases.auth.refresh_token import RefreshToken
@@ -32,10 +31,14 @@ from src.domain.exceptions import (
 from src.infrastructure.auth.jwt_handler import JWTHandler
 from src.infrastructure.auth.password_hasher import PasswordHasher
 from src.infrastructure.database.session import get_async_session
+from src.infrastructure.logging import get_security_logger
 from src.infrastructure.repositories.brand_repository_impl import BrandRepositoryImpl
 from src.infrastructure.repositories.user_repository_impl import UserRepositoryImpl
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+# Security logger for auth events
+security_logger = get_security_logger()
 
 
 # Helper to convert User entity to UserResponse
@@ -51,6 +54,17 @@ def _user_to_response(user: User) -> UserResponse:
     )
 
 
+def _get_client_ip(request: Request) -> str | None:
+    """Extract client IP from request."""
+    # Check for forwarded headers (behind proxy)
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    if request.client:
+        return request.client.host
+    return None
+
+
 @router.post(
     "/login",
     response_model=LoginResponse,
@@ -59,12 +73,14 @@ def _user_to_response(user: User) -> UserResponse:
 )
 async def login(
     request: LoginRequest,
+    http_request: Request,
     session: Annotated[AsyncSession, Depends(get_async_session)],
 ) -> LoginResponse:
     """Authenticate user and return tokens.
 
     Args:
         request: Login request with email and password
+        http_request: HTTP request for client IP extraction
         session: Database session
 
     Returns:
@@ -73,6 +89,7 @@ async def login(
     Raises:
         HTTPException: If credentials are invalid
     """
+    client_ip = _get_client_ip(http_request)
     user_repository = UserRepositoryImpl(session)
     login_use_case = Login(
         user_repository=user_repository,
@@ -86,16 +103,35 @@ async def login(
             password=request.password,
         )
     except InvalidCredentialsError as e:
+        # Log failed login attempt
+        security_logger.log_login_failure(
+            email=request.email,
+            ip_address=client_ip,
+            reason=str(e),
+        )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e),
             headers={"WWW-Authenticate": "Bearer"},
         ) from e
     except ValidationError as e:
+        # Log validation failure as login failure
+        security_logger.log_login_failure(
+            email=request.email,
+            ip_address=client_ip,
+            reason=f"Validation error: {e}",
+        )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         ) from e
+
+    # Log successful login
+    security_logger.log_login_success(
+        email=result.user.email,
+        user_id=str(result.user.id),
+        ip_address=client_ip,
+    )
 
     return LoginResponse(
         user=_user_to_response(result.user),

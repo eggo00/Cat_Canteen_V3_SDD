@@ -1,5 +1,6 @@
 """FastAPI dependencies for authentication and authorization."""
-from typing import Annotated
+from collections.abc import Callable, Coroutine
+from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
@@ -78,7 +79,9 @@ async def get_current_active_user(
     return current_user
 
 
-def require_role(*allowed_roles: str):
+def require_role(
+    *allowed_roles: str,
+) -> Callable[..., Coroutine[Any, Any, UserModel]]:
     """Dependency factory to require specific roles.
 
     Usage:
@@ -117,7 +120,9 @@ def require_role(*allowed_roles: str):
     return check_role
 
 
-def require_brand_access(brand_id: UUID):
+def require_brand_access(
+    brand_id: UUID,
+) -> Callable[..., Coroutine[Any, Any, UserModel]]:
     """Dependency factory to ensure user has access to a specific brand.
 
     Super admins have access to all brands.

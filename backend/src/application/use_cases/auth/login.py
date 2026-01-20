@@ -4,7 +4,6 @@ Handles user authentication with email and password.
 """
 from dataclasses import dataclass
 from datetime import timedelta
-from uuid import UUID
 
 from src.domain.entities.user import User
 from src.domain.exceptions import InvalidCredentialsError, ValidationError

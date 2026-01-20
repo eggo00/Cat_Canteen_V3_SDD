@@ -9,21 +9,21 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.schemas.order_schemas import (
     CreateOrderRequest,
+    OrderItemResponse,
     OrderListResponse,
     OrderResponse,
-    OrderItemResponse,
     OrderStatusEnum,
     UpdateOrderStatusRequest,
 )
 from src.application.use_cases.create_order import CreateOrder
 from src.application.use_cases.get_order import (
+    GetActiveOrders,
     GetOrder,
     GetOrdersByBrand,
-    GetActiveOrders,
 )
 from src.application.use_cases.update_order_status import (
-    UpdateOrderStatus,
     CancelOrder,
+    UpdateOrderStatus,
 )
 from src.domain.entities.order import Order
 from src.domain.exceptions import NotFoundError, ValidationError

@@ -1,9 +1,8 @@
 """Brand API schemas."""
-from uuid import UUID
 
 from pydantic import Field, field_validator
 
-from . import BaseSchema, IDSchema, TimestampSchema
+from . import BaseSchema, IDSchema
 
 
 class ThemeConfigSchema(BaseSchema):

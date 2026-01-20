@@ -1,9 +1,7 @@
 """Order API Schemas - Pydantic models for request/response validation."""
 
 from datetime import datetime
-from decimal import Decimal
 from enum import Enum
-from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, Field, field_validator
@@ -33,10 +31,10 @@ class CreateOrderItemSchema(BaseModel):
 
     menu_item_id: UUID = Field(..., description="Menu item ID")
     quantity: int = Field(default=1, ge=1, le=100, description="Quantity to order")
-    customizations: Optional[list[CustomizationSchema]] = Field(
+    customizations: list[CustomizationSchema] | None = Field(
         default=None, description="Selected customizations"
     )
-    notes: Optional[str] = Field(
+    notes: str | None = Field(
         default=None, max_length=500, description="Special instructions"
     )
 
@@ -53,7 +51,7 @@ class CreateOrderRequest(BaseModel):
     items: list[CreateOrderItemSchema] = Field(
         ..., min_length=1, description="Order items"
     )
-    notes: Optional[str] = Field(
+    notes: str | None = Field(
         default=None, max_length=1000, description="Order notes"
     )
 
@@ -85,7 +83,7 @@ class OrderItemResponse(BaseModel):
     unit_price: float
     subtotal: float
     customizations: list[dict] = Field(default_factory=list)
-    notes: Optional[str] = None
+    notes: str | None = None
 
 
 class OrderResponse(BaseModel):
@@ -99,7 +97,7 @@ class OrderResponse(BaseModel):
     items: list[OrderItemResponse]
     status: OrderStatusEnum
     status_display: str
-    notes: Optional[str] = None
+    notes: str | None = None
     total: float
     item_count: int
     created_at: datetime

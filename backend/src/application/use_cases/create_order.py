@@ -7,7 +7,6 @@ from decimal import Decimal
 from uuid import UUID
 
 from src.domain.entities.order import Order
-from src.domain.entities.order_item import OrderItem
 from src.domain.exceptions import NotFoundError, ValidationError
 from src.domain.repositories.brand_repository import BrandRepository
 from src.domain.repositories.menu_repository import MenuRepository

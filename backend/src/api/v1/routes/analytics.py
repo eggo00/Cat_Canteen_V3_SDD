@@ -5,7 +5,6 @@ REST endpoints for analytics and reporting.
 """
 
 from datetime import date, timedelta
-from decimal import Decimal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response

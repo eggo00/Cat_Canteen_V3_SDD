@@ -8,7 +8,6 @@ from uuid import UUID
 
 from src.domain.entities.order import Order
 from src.domain.entities.order_item import OrderItem
-from src.domain.exceptions import ValidationError
 from src.domain.value_objects.order_status import OrderStatus
 
 

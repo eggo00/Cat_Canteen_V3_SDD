@@ -11,9 +11,9 @@ from datetime import date, timedelta
 from enum import Enum
 from uuid import UUID
 
+from .get_orders_by_hour import GetOrdersByHour
 from .get_revenue_stats import GetRevenueStats
 from .get_top_items import GetTopItems
-from .get_orders_by_hour import GetOrdersByHour
 
 
 class ReportFormat(str, Enum):

@@ -5,12 +5,12 @@ Retrieves revenue statistics for a brand within a date range.
 """
 
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from decimal import Decimal
 from uuid import UUID
 
-from src.domain.repositories.order_repository import OrderRepository
 from src.domain.repositories.brand_repository import BrandRepository
+from src.domain.repositories.order_repository import OrderRepository
 from src.domain.value_objects.order_status import OrderStatus
 
 

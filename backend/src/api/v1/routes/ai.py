@@ -13,15 +13,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.schemas.ai_schemas import (
     AIStatusResponse,
-    DemandForecastRequest,
     DemandForecastResponse,
     DemandPredictionItem,
     RecommendationItemResponse,
-    RecommendationRequest,
     RecommendationResponse,
     UserPreferenceResponse,
 )
-from src.domain.exceptions import NotFoundError
 from src.infrastructure.ai.ai_service_stub import AIServiceStub, get_ai_service
 from src.infrastructure.database.session import get_async_session
 from src.infrastructure.repositories.brand_repository_impl import BrandRepositoryImpl

@@ -1,7 +1,7 @@
 """SQLAlchemy models for Menu entities (Category, MenuItem, CustomizationOption)."""
 from decimal import Decimal
 
-from sqlalchemy import Boolean, ForeignKey, Integer, JSON, Numeric, String, Text
+from sqlalchemy import JSON, Boolean, ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

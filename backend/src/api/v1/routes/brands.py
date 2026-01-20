@@ -13,7 +13,6 @@ from src.api.v1.schemas.brand_schemas import (
 from src.api.v1.schemas.error_schemas import COMMON_RESPONSES
 from src.application.use_cases.create_brand import CreateBrand
 from src.application.use_cases.get_brand_by_slug import GetBrandBySlug
-from src.domain.entities.brand import Brand
 from src.domain.exceptions import DuplicateSlugError, NotFoundError, ValidationError
 from src.domain.services.menu_engine import MenuEngine
 from src.domain.services.theme_engine import ThemeEngine

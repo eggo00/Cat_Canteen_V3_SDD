@@ -3,7 +3,6 @@
 Handles user registration with validation and password hashing.
 """
 from dataclasses import dataclass
-from typing import Any
 from uuid import UUID
 
 from src.domain.entities.user import User, UserRole
