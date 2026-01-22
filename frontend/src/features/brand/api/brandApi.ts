@@ -5,7 +5,6 @@
 
 import { get, post, patch, del } from '../../../shared/utils/api';
 import {
-  Brand,
   BrandResponse,
   CreateBrandRequest,
   UpdateBrandRequest,

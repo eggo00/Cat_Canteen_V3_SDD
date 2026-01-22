@@ -222,7 +222,7 @@ export const useAuthStore = create<AuthState>()(
         refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
       }),
-      onRehydrate: () => (state) => {
+      onRehydrateStorage: () => (state: AuthState | undefined) => {
         // Set auth token on rehydrate
         if (state?.accessToken) {
           setAuthToken(state.accessToken);

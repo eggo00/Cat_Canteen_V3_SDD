@@ -5,7 +5,7 @@
 
 import { useMemo, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getMenu, getCategories } from '../api/menuApi';
+import { getMenu } from '../api/menuApi';
 import { Category, MenuItem, MenuResponse } from '../../../shared/types/menu';
 
 /**

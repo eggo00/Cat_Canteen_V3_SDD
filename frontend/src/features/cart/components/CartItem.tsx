@@ -3,7 +3,6 @@
  * Displays a single item in the cart with quantity controls
  */
 
-import React from 'react';
 import { CartItem as CartItemType } from '../store/cartStore';
 
 /**
@@ -40,7 +39,7 @@ export function CartItem({
   onIncrement,
   onDecrement,
   onRemove,
-  onUpdateNotes,
+  onUpdateNotes: _onUpdateNotes,
 }: CartItemProps): JSX.Element {
   return (
     <div

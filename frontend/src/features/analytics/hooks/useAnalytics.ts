@@ -3,7 +3,7 @@
  * Fetches and manages analytics data
  */
 
-import { useMemo, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import {
   getRevenueStats,

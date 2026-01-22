@@ -3,7 +3,6 @@
  * Horizontal scrollable category filter tabs
  */
 
-import React from 'react';
 import { Category } from '../../../shared/types/menu';
 
 /**

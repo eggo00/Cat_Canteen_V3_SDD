@@ -3,7 +3,6 @@
  * Displays top selling items as horizontal bar chart
  */
 
-import React from 'react';
 import { TopItem } from '../../../shared/types/analytics';
 
 interface TopItemsChartProps {

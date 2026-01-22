@@ -5,7 +5,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { MenuItem, CustomizationOption } from '../../../shared/types/menu';
+import { MenuItem } from '../../../shared/types/menu';
 
 /**
  * Cart item with quantity and customizations

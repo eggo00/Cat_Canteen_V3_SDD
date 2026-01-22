@@ -3,7 +3,6 @@
  * Displays the shopping cart with all items and checkout button
  */
 
-import React from 'react';
 import { useCart } from '../hooks/useCart';
 import { CartItem } from './CartItem';
 

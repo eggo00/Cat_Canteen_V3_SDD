@@ -3,7 +3,6 @@
  * Displays a single menu item with price and customization options
  */
 
-import React from 'react';
 import { MenuItem as MenuItemType } from '../../../shared/types/menu';
 
 /**

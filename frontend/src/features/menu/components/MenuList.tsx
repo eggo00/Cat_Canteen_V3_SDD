@@ -3,7 +3,6 @@
  * Displays a grid of menu items with loading and empty states
  */
 
-import React from 'react';
 import { MenuItem as MenuItemType } from '../../../shared/types/menu';
 import { MenuItem } from './MenuItem';
 

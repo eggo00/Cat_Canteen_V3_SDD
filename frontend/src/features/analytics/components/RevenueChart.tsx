@@ -3,7 +3,7 @@
  * Displays daily revenue as a bar chart
  */
 
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { DailyRevenue } from '../../../shared/types/analytics';
 
 interface RevenueChartProps {
@@ -79,7 +79,7 @@ export function RevenueChart({
 
         {/* Bars container */}
         <div className="ml-12 flex h-full items-end gap-1 overflow-hidden">
-          {data.slice(-30).map((day, index) => {
+          {data.slice(-30).map((day) => {
             const barHeight =
               maxRevenue > 0
                 ? (day.totalRevenue / maxRevenue) * 100
