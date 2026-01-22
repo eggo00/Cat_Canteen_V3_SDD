@@ -3,7 +3,7 @@
  * Provides theme context and handles CSS variable injection
  */
 
-import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { ThemeConfig } from '../shared/types/brand';
 import { applyTheme, clearTheme, defaultTheme } from './themeConfig';
 

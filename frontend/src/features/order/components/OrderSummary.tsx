@@ -3,7 +3,6 @@
  * Displays order summary with items and total
  */
 
-import React from 'react';
 import { CartItem } from '../../cart/store/cartStore';
 
 /**

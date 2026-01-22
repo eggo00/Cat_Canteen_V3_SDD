@@ -3,7 +3,7 @@
  * Fetches and tracks order status with polling support
  */
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getOrderByNumber, getOrderById } from '../api/orderApi';
 import { Order, OrderStatus, ORDER_STATUS_DISPLAY } from '../../../shared/types/order';
 import { orderQueryKeys } from './useCreateOrder';

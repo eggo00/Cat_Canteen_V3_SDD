@@ -11,7 +11,6 @@ import {
   UpdateOrderStatusRequest,
   OrderStatus,
   OrderItem,
-  OrderCustomization,
 } from '../../../shared/types/order';
 
 /**

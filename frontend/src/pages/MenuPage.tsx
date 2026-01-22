@@ -3,7 +3,8 @@
  * Main menu page with brand theme and menu display
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import type { CSSProperties } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useBrandTheme } from '../features/brand/hooks/useBrandTheme';
 import { useMenu } from '../features/menu/hooks/useMenu';
@@ -34,7 +35,7 @@ function SearchInput({
         className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 text-sm focus:border-transparent focus:outline-none focus:ring-2"
         style={{
           '--tw-ring-color': 'var(--color-primary, #FF6B6B)',
-        } as React.CSSProperties}
+        } as CSSProperties}
         data-testid="menu-search"
       />
       <svg

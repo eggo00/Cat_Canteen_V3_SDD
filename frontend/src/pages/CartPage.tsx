@@ -3,7 +3,6 @@
  * Page for viewing and managing shopping cart
  */
 
-import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Cart } from '../features/cart/components/Cart';
 

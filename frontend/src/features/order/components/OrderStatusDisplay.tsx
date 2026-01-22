@@ -192,7 +192,6 @@ export function OrderStatusDisplay({
                     isActive
                       ? {
                           backgroundColor: 'var(--color-primary, #FF6B6B)',
-                          ringColor: 'var(--color-primary, #FF6B6B)',
                         }
                       : undefined
                   }

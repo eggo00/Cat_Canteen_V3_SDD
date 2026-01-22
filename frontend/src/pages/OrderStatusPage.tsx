@@ -3,11 +3,9 @@
  * Page for viewing order status and details
  */
 
-import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useOrderStatus } from '../features/order/hooks/useOrderStatus';
 import { OrderStatusDisplay } from '../features/order/components/OrderStatusDisplay';
-import { ORDER_STATUS_DISPLAY } from '../shared/types/order';
 
 /**
  * Format date for display

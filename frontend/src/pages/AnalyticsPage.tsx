@@ -3,7 +3,6 @@
  * Dashboard for viewing analytics and reports
  */
 
-import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useBrandTheme } from '../features/brand/hooks/useBrandTheme';
 import { useAnalytics } from '../features/analytics/hooks/useAnalytics';
@@ -296,7 +295,7 @@ export function AnalyticsPage(): JSX.Element {
               <StatCard
                 title="尖峰時段"
                 value={
-                  summary?.peakHour !== null
+                  summary?.peakHour !== null && summary?.peakHour !== undefined
                     ? `${summary.peakHour.toString().padStart(2, '0')}:00`
                     : '—'
                 }
