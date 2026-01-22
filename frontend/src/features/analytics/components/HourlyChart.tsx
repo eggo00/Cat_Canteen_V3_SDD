@@ -3,7 +3,7 @@
  * Displays hourly order distribution
  */
 
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { HourlyOrders } from '../../../shared/types/analytics';
 
 interface HourlyChartProps {

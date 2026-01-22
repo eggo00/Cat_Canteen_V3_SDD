@@ -4,7 +4,7 @@
  */
 
 // API
-export { aiApi } from './api/aiApi';
+export { default as aiApi } from './api/aiApi';
 
 // Hooks
 export { useRecommendations, useDemandForecast, useUserPreferences } from './hooks/useRecommendations';

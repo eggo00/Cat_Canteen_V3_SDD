@@ -3,7 +3,6 @@
  * Quick date range selection for analytics
  */
 
-import React from 'react';
 
 interface DateRangePickerProps {
   days: number;
