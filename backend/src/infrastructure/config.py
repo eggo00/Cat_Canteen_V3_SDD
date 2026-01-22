@@ -29,6 +29,17 @@ class Settings(BaseSettings):
         examples=["postgresql://user:password@localhost:5432/catcanteen"],
     )
 
+    @property
+    def async_database_url(self) -> str:
+        """Get async-compatible database URL with asyncpg driver."""
+        url = self.DATABASE_URL
+        # Convert postgresql:// to postgresql+asyncpg://
+        if url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        return url
+
     # JWT Authentication
     JWT_SECRET: str = Field(..., description="Secret key for JWT token generation")
     JWT_ALGORITHM: str = "HS256"
