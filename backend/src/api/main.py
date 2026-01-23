@@ -236,7 +236,7 @@ async def seed_database() -> dict[str, Any]:
         else:
             # Create admin user
             admin_id = uuid4()
-            password_hash = PasswordHasher.hash_password("Admin123!")
+            password_hash = PasswordHasher.hash_password("admin123")
 
             await session.execute(
                 text("""
@@ -251,7 +251,7 @@ async def seed_database() -> dict[str, Any]:
                     "role": "super_admin",
                 }
             )
-            results["created"].append("Admin user: admin@catcanteen.com / Admin123!")
+            results["created"].append("Admin user: admin@catcanteen.com / admin123")
 
         # Check if demo brand exists
         result = await session.execute(
@@ -342,6 +342,6 @@ async def seed_database() -> dict[str, Any]:
         "demo_url": "/demo-cafe/menu",
         "admin_credentials": {
             "email": "admin@catcanteen.com",
-            "password": "Admin123!"
+            "password": "admin123"
         }
     }
