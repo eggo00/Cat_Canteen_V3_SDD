@@ -236,7 +236,7 @@ async def seed_database() -> dict[str, Any]:
         else:
             # Create admin user
             admin_id = uuid4()
-            password_hash = PasswordHasher.hash("Admin123!")
+            password_hash = PasswordHasher.hash_password("Admin123!")
 
             await session.execute(
                 text("""
