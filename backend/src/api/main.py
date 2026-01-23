@@ -113,3 +113,144 @@ app.include_router(analytics.router, prefix="/v1")
 app.include_router(brands.router, prefix="/v1")
 app.include_router(menus.router, prefix="/v1")
 app.include_router(orders.router, prefix="/v1")
+
+
+# Seed endpoint for initial data setup
+@app.post("/seed", tags=["Setup"])
+async def seed_database() -> dict[str, Any]:
+    """Create initial admin user and demo data.
+
+    This endpoint can only be used once to bootstrap the database.
+    It will create:
+    - Super admin user (admin@catcanteen.com / Admin123!)
+    - Demo brand with menu items
+
+    Returns:
+        dict: Seed result information
+    """
+    from uuid import uuid4
+    from sqlalchemy import text
+    from src.infrastructure.database.session import AsyncSessionLocal
+    from src.infrastructure.auth.password_hasher import PasswordHasher
+
+    results = {"created": [], "skipped": []}
+
+    async with AsyncSessionLocal() as session:
+        # Check if admin already exists
+        result = await session.execute(
+            text("SELECT id FROM users WHERE email = 'admin@catcanteen.com'")
+        )
+        if result.fetchone():
+            results["skipped"].append("Admin user already exists")
+        else:
+            # Create admin user
+            admin_id = uuid4()
+            password_hash = PasswordHasher.hash("Admin123!")
+
+            await session.execute(
+                text("""
+                    INSERT INTO users (id, email, password_hash, full_name, role, is_active)
+                    VALUES (:id, :email, :password_hash, :name, :role, TRUE)
+                """),
+                {
+                    "id": admin_id,
+                    "email": "admin@catcanteen.com",
+                    "password_hash": password_hash,
+                    "name": "Super Admin",
+                    "role": "super_admin",
+                }
+            )
+            results["created"].append("Admin user: admin@catcanteen.com / Admin123!")
+
+        # Check if demo brand exists
+        result = await session.execute(
+            text("SELECT id FROM brands WHERE slug = 'demo-cafe'")
+        )
+        brand_row = result.fetchone()
+
+        if brand_row:
+            results["skipped"].append("Demo brand already exists")
+        else:
+            # Create demo brand
+            brand_id = uuid4()
+            await session.execute(
+                text("""
+                    INSERT INTO brands (id, name, slug, description, primary_color, secondary_color)
+                    VALUES (:id, :name, :slug, :description, :primary_color, :secondary_color)
+                """),
+                {
+                    "id": brand_id,
+                    "name": "Demo Cafe",
+                    "slug": "demo-cafe",
+                    "description": "歡迎來到 Demo Cafe！我們提供各式精選咖啡和輕食。",
+                    "primary_color": "#8B4513",
+                    "secondary_color": "#D2691E",
+                }
+            )
+            results["created"].append("Demo brand: demo-cafe")
+
+            # Create categories
+            drinks_id = uuid4()
+            food_id = uuid4()
+            desserts_id = uuid4()
+
+            await session.execute(
+                text("""
+                    INSERT INTO categories (id, brand_id, name, description, display_order)
+                    VALUES
+                        (:drinks_id, :brand_id, '飲品', '各式咖啡和茶飲', 1),
+                        (:food_id, :brand_id, '輕食', '三明治和沙拉', 2),
+                        (:desserts_id, :brand_id, '甜點', '蛋糕和點心', 3)
+                """),
+                {
+                    "drinks_id": drinks_id,
+                    "food_id": food_id,
+                    "desserts_id": desserts_id,
+                    "brand_id": brand_id,
+                }
+            )
+            results["created"].append("Categories: 飲品, 輕食, 甜點")
+
+            # Create menu items
+            menu_items = [
+                (uuid4(), drinks_id, "美式咖啡", "經典美式，香醇濃郁", 60, True),
+                (uuid4(), drinks_id, "拿鐵咖啡", "濃郁咖啡配上綿密奶泡", 80, True),
+                (uuid4(), drinks_id, "卡布奇諾", "義式經典，奶泡豐富", 85, False),
+                (uuid4(), drinks_id, "抹茶拿鐵", "日式抹茶與牛奶的完美結合", 90, True),
+                (uuid4(), drinks_id, "紅茶拿鐵", "錫蘭紅茶配上鮮奶", 75, False),
+                (uuid4(), food_id, "火腿起司三明治", "經典組合，滿足一整天", 120, True),
+                (uuid4(), food_id, "燻鮭魚貝果", "新鮮燻鮭魚配奶油起司", 150, False),
+                (uuid4(), food_id, "凱薩沙拉", "羅蔓生菜配帕瑪森起司", 130, False),
+                (uuid4(), desserts_id, "提拉米蘇", "義式經典甜點", 120, True),
+                (uuid4(), desserts_id, "紐約起司蛋糕", "濃郁起司香", 110, False),
+                (uuid4(), desserts_id, "巧克力布朗尼", "濃厚巧克力風味", 90, True),
+            ]
+
+            for item_id, cat_id, name, desc, price, is_popular in menu_items:
+                await session.execute(
+                    text("""
+                        INSERT INTO menu_items (id, category_id, name, description, price, is_popular, is_available)
+                        VALUES (:id, :category_id, :name, :description, :price, :is_popular, TRUE)
+                    """),
+                    {
+                        "id": item_id,
+                        "category_id": cat_id,
+                        "name": name,
+                        "description": desc,
+                        "price": price,
+                        "is_popular": is_popular,
+                    }
+                )
+            results["created"].append(f"Menu items: {len(menu_items)} items")
+
+        await session.commit()
+
+    return {
+        "status": "success",
+        "results": results,
+        "demo_url": "/demo-cafe/menu",
+        "admin_credentials": {
+            "email": "admin@catcanteen.com",
+            "password": "Admin123!"
+        }
+    }
