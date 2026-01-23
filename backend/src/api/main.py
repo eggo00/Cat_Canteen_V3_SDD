@@ -122,6 +122,7 @@ async def seed_database() -> dict[str, Any]:
 
     This endpoint can only be used once to bootstrap the database.
     It will create:
+    - Database tables (if not exist)
     - Super admin user (admin@catcanteen.com / Admin123!)
     - Demo brand with menu items
 
@@ -130,10 +131,100 @@ async def seed_database() -> dict[str, Any]:
     """
     from uuid import uuid4
     from sqlalchemy import text
-    from src.infrastructure.database.session import AsyncSessionLocal
+    from src.infrastructure.database.session import AsyncSessionLocal, async_engine
     from src.infrastructure.auth.password_hasher import PasswordHasher
 
     results = {"created": [], "skipped": []}
+
+    # Create tables first
+    async with async_engine.begin() as conn:
+        await conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS users (
+                id UUID PRIMARY KEY,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                password_hash VARCHAR(255) NOT NULL,
+                full_name VARCHAR(255),
+                role VARCHAR(50) NOT NULL DEFAULT 'customer',
+                brand_id UUID,
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """))
+        await conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS brands (
+                id UUID PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                slug VARCHAR(255) UNIQUE NOT NULL,
+                description TEXT,
+                logo_url VARCHAR(500),
+                primary_color VARCHAR(7) DEFAULT '#FF6B6B',
+                secondary_color VARCHAR(7) DEFAULT '#4ECDC4',
+                accent_color VARCHAR(7) DEFAULT '#FFE66D',
+                background_color VARCHAR(7) DEFAULT '#FFFFFF',
+                text_color VARCHAR(7) DEFAULT '#2C3E50',
+                font_family VARCHAR(100) DEFAULT 'Inter, system-ui, sans-serif',
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """))
+        await conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS categories (
+                id UUID PRIMARY KEY,
+                brand_id UUID NOT NULL REFERENCES brands(id),
+                name VARCHAR(255) NOT NULL,
+                description TEXT,
+                display_order INTEGER DEFAULT 0,
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """))
+        await conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS menu_items (
+                id UUID PRIMARY KEY,
+                category_id UUID NOT NULL REFERENCES categories(id),
+                name VARCHAR(255) NOT NULL,
+                description TEXT,
+                price DECIMAL(10, 2) NOT NULL,
+                image_url VARCHAR(500),
+                is_available BOOLEAN DEFAULT TRUE,
+                is_popular BOOLEAN DEFAULT FALSE,
+                display_order INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """))
+        await conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS orders (
+                id UUID PRIMARY KEY,
+                brand_id UUID NOT NULL REFERENCES brands(id),
+                order_number VARCHAR(50) UNIQUE NOT NULL,
+                customer_name VARCHAR(255),
+                customer_phone VARCHAR(50),
+                status VARCHAR(50) DEFAULT 'pending',
+                subtotal DECIMAL(10, 2) NOT NULL,
+                tax DECIMAL(10, 2) DEFAULT 0,
+                total DECIMAL(10, 2) NOT NULL,
+                notes TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """))
+        await conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS order_items (
+                id UUID PRIMARY KEY,
+                order_id UUID NOT NULL REFERENCES orders(id),
+                menu_item_id UUID NOT NULL REFERENCES menu_items(id),
+                quantity INTEGER NOT NULL,
+                unit_price DECIMAL(10, 2) NOT NULL,
+                subtotal DECIMAL(10, 2) NOT NULL,
+                notes TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """))
+        results["created"].append("Database tables")
 
     async with AsyncSessionLocal() as session:
         # Check if admin already exists
