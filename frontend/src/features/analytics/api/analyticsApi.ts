@@ -207,7 +207,7 @@ export async function exportReport(
   const url = `/analytics/brands/${brandId}/export/${reportType}${query}`;
 
   // Use fetch directly for blob response
-  const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/v1';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/v1';
   const response = await fetch(`${baseUrl}${url}`, {
     method: 'GET',
     headers: {
