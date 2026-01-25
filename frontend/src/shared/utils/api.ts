@@ -6,23 +6,30 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } f
 
 // Determine API URL based on environment
 const getApiBaseUrl = (): string => {
-  // First check for explicit environment variable
-  if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL;
-  }
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
 
-  // Auto-detect based on current hostname (for Zeabur deployment)
-  const hostname = window.location.hostname;
-  if (hostname.includes('zeabur.app')) {
-    // Production: use Zeabur backend URL
+  // Debug log
+  console.log('[API] hostname:', hostname);
+
+  // For Zeabur deployment - check hostname first (runtime detection)
+  if (hostname.includes('zeabur.app') || hostname.includes('zeabur.internal')) {
+    console.log('[API] Using Zeabur backend URL');
     return 'https://cat-canteen-backend.zeabur.app/v1';
   }
 
+  // Check for explicit environment variable
+  if (import.meta.env.VITE_API_BASE_URL) {
+    console.log('[API] Using env var:', import.meta.env.VITE_API_BASE_URL);
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+
   // Development: use localhost
+  console.log('[API] Using localhost');
   return 'http://localhost:8000/v1';
 };
 
 const API_BASE_URL = getApiBaseUrl();
+console.log('[API] Final API_BASE_URL:', API_BASE_URL);
 
 /**
  * Create axios instance with default configuration
