@@ -233,26 +233,26 @@ async def seed_database() -> dict[str, Any]:
             )
             results["created"].append("Categories: 飲品, 輕食, 甜點")
 
-            # Create menu items (no is_popular column in model)
+            # Create menu items with display_order
             menu_items = [
-                (uuid4(), drinks_id, "美式咖啡", "經典美式，香醇濃郁", 60),
-                (uuid4(), drinks_id, "拿鐵咖啡", "濃郁咖啡配上綿密奶泡", 80),
-                (uuid4(), drinks_id, "卡布奇諾", "義式經典，奶泡豐富", 85),
-                (uuid4(), drinks_id, "抹茶拿鐵", "日式抹茶與牛奶的完美結合", 90),
-                (uuid4(), drinks_id, "紅茶拿鐵", "錫蘭紅茶配上鮮奶", 75),
-                (uuid4(), food_id, "火腿起司三明治", "經典組合，滿足一整天", 120),
-                (uuid4(), food_id, "燻鮭魚貝果", "新鮮燻鮭魚配奶油起司", 150),
-                (uuid4(), food_id, "凱薩沙拉", "羅蔓生菜配帕瑪森起司", 130),
-                (uuid4(), desserts_id, "提拉米蘇", "義式經典甜點", 120),
-                (uuid4(), desserts_id, "紐約起司蛋糕", "濃郁起司香", 110),
-                (uuid4(), desserts_id, "巧克力布朗尼", "濃厚巧克力風味", 90),
+                (uuid4(), drinks_id, "美式咖啡", "經典美式，香醇濃郁", 60, 1),
+                (uuid4(), drinks_id, "拿鐵咖啡", "濃郁咖啡配上綿密奶泡", 80, 2),
+                (uuid4(), drinks_id, "卡布奇諾", "義式經典，奶泡豐富", 85, 3),
+                (uuid4(), drinks_id, "抹茶拿鐵", "日式抹茶與牛奶的完美結合", 90, 4),
+                (uuid4(), drinks_id, "紅茶拿鐵", "錫蘭紅茶配上鮮奶", 75, 5),
+                (uuid4(), food_id, "火腿起司三明治", "經典組合，滿足一整天", 120, 1),
+                (uuid4(), food_id, "燻鮭魚貝果", "新鮮燻鮭魚配奶油起司", 150, 2),
+                (uuid4(), food_id, "凱薩沙拉", "羅蔓生菜配帕瑪森起司", 130, 3),
+                (uuid4(), desserts_id, "提拉米蘇", "義式經典甜點", 120, 1),
+                (uuid4(), desserts_id, "紐約起司蛋糕", "濃郁起司香", 110, 2),
+                (uuid4(), desserts_id, "巧克力布朗尼", "濃厚巧克力風味", 90, 3),
             ]
 
-            for item_id, cat_id, name, desc, price in menu_items:
+            for item_id, cat_id, name, desc, price, order in menu_items:
                 await session.execute(
                     text("""
-                        INSERT INTO menu_items (id, category_id, name, description, price, is_available)
-                        VALUES (:id, :category_id, :name, :description, :price, TRUE)
+                        INSERT INTO menu_items (id, category_id, name, description, price, display_order, is_available)
+                        VALUES (:id, :category_id, :name, :description, :price, :display_order, TRUE)
                     """),
                     {
                         "id": str(item_id),
@@ -260,6 +260,7 @@ async def seed_database() -> dict[str, Any]:
                         "name": name,
                         "description": desc,
                         "price": price,
+                        "display_order": order,
                     }
                 )
             results["created"].append(f"Menu items: {len(menu_items)} items")
