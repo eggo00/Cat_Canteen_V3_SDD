@@ -135,13 +135,17 @@ async def seed_database() -> dict[str, Any]:
     from src.infrastructure.database.session import AsyncSessionLocal, async_engine
     from src.infrastructure.auth.password_hasher import PasswordHasher
 
-    results = {"created": [], "skipped": []}
+    results = {"created": [], "skipped": [], "dropped": []}
 
-    # Create tables using SQLAlchemy models (correct structure)
+    # Drop and recreate tables using SQLAlchemy models (correct structure)
     from src.infrastructure.database.models import Base
     async with async_engine.begin() as conn:
+        # Drop all existing tables first
+        await conn.run_sync(Base.metadata.drop_all)
+        results["dropped"].append("All existing tables")
+        # Create tables with correct structure
         await conn.run_sync(Base.metadata.create_all)
-        results["created"].append("Database tables")
+        results["created"].append("Database tables (fresh)")
 
     async with AsyncSessionLocal() as session:
         # Check if admin already exists
