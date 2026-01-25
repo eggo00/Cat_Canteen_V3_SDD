@@ -4,6 +4,9 @@
 # Stage 1: Builder
 FROM node:20-slim as builder
 
+# Build arguments for Vite environment variables
+ARG VITE_API_BASE_URL=http://localhost:8000/v1
+
 # Install pnpm
 RUN npm install -g pnpm@8.15.0
 
@@ -18,6 +21,9 @@ RUN pnpm install
 
 # Copy source code
 COPY . .
+
+# Set environment variables for build
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 # Build application
 RUN pnpm build
