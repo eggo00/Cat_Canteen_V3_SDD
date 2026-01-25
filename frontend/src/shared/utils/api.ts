@@ -4,7 +4,25 @@
  */
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/v1';
+// Determine API URL based on environment
+const getApiBaseUrl = (): string => {
+  // First check for explicit environment variable
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+
+  // Auto-detect based on current hostname (for Zeabur deployment)
+  const hostname = window.location.hostname;
+  if (hostname.includes('zeabur.app')) {
+    // Production: use Zeabur backend URL
+    return 'https://cat-canteen-backend.zeabur.app/v1';
+  }
+
+  // Development: use localhost
+  return 'http://localhost:8000/v1';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 /**
  * Create axios instance with default configuration
