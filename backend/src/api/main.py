@@ -51,7 +51,13 @@ app = FastAPI(
     redoc_url="/redoc" if settings.DEBUG else None,
 )
 
-# Add CORS middleware
+# Add custom middleware (order matters - last added = outermost)
+# CORSMiddleware must be outermost to handle preflight OPTIONS requests
+app.add_middleware(ErrorHandlingMiddleware)
+app.add_middleware(RequestLoggingMiddleware)
+app.add_middleware(CORSSecurityMiddleware)
+
+# Add CORS middleware LAST so it's outermost and handles preflight first
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
@@ -59,11 +65,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Add custom middleware (order matters - first added = outermost)
-app.add_middleware(ErrorHandlingMiddleware)
-app.add_middleware(RequestLoggingMiddleware)
-app.add_middleware(CORSSecurityMiddleware)
 
 # Add rate limiting (only in production or if explicitly enabled)
 if settings.is_production:
