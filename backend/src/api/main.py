@@ -140,9 +140,10 @@ async def seed_database() -> dict[str, Any]:
     # Drop and recreate tables using SQLAlchemy models (correct structure)
     from src.infrastructure.database.models import Base
     async with async_engine.begin() as conn:
-        # Drop all existing tables first
-        await conn.run_sync(Base.metadata.drop_all)
-        results["dropped"].append("All existing tables")
+        # Drop all existing tables with CASCADE to handle foreign key dependencies
+        await conn.execute(text("DROP SCHEMA public CASCADE"))
+        await conn.execute(text("CREATE SCHEMA public"))
+        results["dropped"].append("All existing tables (CASCADE)")
         # Create tables with correct structure
         await conn.run_sync(Base.metadata.create_all)
         results["created"].append("Database tables (fresh)")
