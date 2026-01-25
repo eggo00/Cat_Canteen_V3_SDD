@@ -167,7 +167,7 @@ async def seed_database() -> dict[str, Any]:
                     VALUES (:id, :email, :password_hash, :name, :role, TRUE)
                 """),
                 {
-                    "id": admin_id,
+                    "id": str(admin_id),
                     "email": "admin@catcanteen.com",
                     "password_hash": password_hash,
                     "name": "Super Admin",
@@ -199,10 +199,10 @@ async def seed_database() -> dict[str, Any]:
             await session.execute(
                 text("""
                     INSERT INTO brands (id, name, slug, description, theme_config, is_active)
-                    VALUES (:id, :name, :slug, :description, :theme_config::jsonb, TRUE)
+                    VALUES (:id, :name, :slug, :description, CAST(:theme_config AS jsonb), TRUE)
                 """),
                 {
-                    "id": brand_id,
+                    "id": str(brand_id),
                     "name": "Demo Cafe",
                     "slug": "demo-cafe",
                     "description": "歡迎來到 Demo Cafe！我們提供各式精選咖啡和輕食。",
@@ -225,10 +225,10 @@ async def seed_database() -> dict[str, Any]:
                         (:desserts_id, :brand_id, '甜點', '蛋糕和點心', 3, TRUE)
                 """),
                 {
-                    "drinks_id": drinks_id,
-                    "food_id": food_id,
-                    "desserts_id": desserts_id,
-                    "brand_id": brand_id,
+                    "drinks_id": str(drinks_id),
+                    "food_id": str(food_id),
+                    "desserts_id": str(desserts_id),
+                    "brand_id": str(brand_id),
                 }
             )
             results["created"].append("Categories: 飲品, 輕食, 甜點")
@@ -255,8 +255,8 @@ async def seed_database() -> dict[str, Any]:
                         VALUES (:id, :category_id, :name, :description, :price, TRUE)
                     """),
                     {
-                        "id": item_id,
-                        "category_id": cat_id,
+                        "id": str(item_id),
+                        "category_id": str(cat_id),
                         "name": name,
                         "description": desc,
                         "price": price,
