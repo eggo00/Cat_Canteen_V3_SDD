@@ -76,7 +76,7 @@ class OrderItemModel(Base, UUIDMixin, TimestampMixin):
     quantity: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
 
     # Customizations (stored as JSONB)
-    customizations: Mapped[dict | None] = mapped_column(
+    customizations: Mapped[list | None] = mapped_column(
         JSON().with_variant(JSONB, "postgresql"),  # PostgreSQL 用 JSONB，其他用 JSON
         nullable=True,
         comment="Customer customizations (toppings, sweetness, etc.)",
