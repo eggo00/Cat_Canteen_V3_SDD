@@ -10,6 +10,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.application.services.ai_service import (
     AIService,
@@ -78,10 +79,11 @@ class AIServiceStub(AIService):
         recommendations = []
 
         if self.session:
-            # Fetch real menu items from database
+            # Fetch real menu items from database with eager loading
             stmt = (
                 select(MenuItemModel)
                 .join(CategoryModel)
+                .options(selectinload(MenuItemModel.category))
                 .where(CategoryModel.brand_id == brand_id)
                 .where(MenuItemModel.is_available == True)
                 .limit(limit)
