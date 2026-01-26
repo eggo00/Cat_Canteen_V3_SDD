@@ -238,8 +238,6 @@ export default function AdminDashboardPage(): JSX.Element {
             icon="🎨"
             title="Brand Settings"
             description="Customize your brand's appearance including logo, colors, and theme."
-            disabled
-            comingSoon
           />
 
           {/* Analytics */}

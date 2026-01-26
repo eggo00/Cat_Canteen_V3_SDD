@@ -6,6 +6,8 @@ export interface ThemeConfig {
   primaryColor: string;
   secondaryColor: string;
   accentColor?: string;
+  backgroundColor?: string;
+  textColor?: string;
   fontFamily?: string;
   logoUrl?: string;
   [key: string]: string | undefined; // Allow additional theme properties

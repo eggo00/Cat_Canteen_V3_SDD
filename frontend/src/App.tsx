@@ -14,6 +14,7 @@ import { AnalyticsPage } from './pages/AnalyticsPage';
 import LoginPage from './pages/LoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import MenuUploadPage from './pages/MenuUploadPage';
+import BrandManagementPage from './pages/BrandManagementPage';
 import { AdminRoute } from './features/auth';
 
 // Create a client for React Query
@@ -122,6 +123,14 @@ function App(): JSX.Element {
               element={
                 <AdminRoute>
                   <MenuUploadPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/:brandSlug/admin/brand"
+              element={
+                <AdminRoute>
+                  <BrandManagementPage />
                 </AdminRoute>
               }
             />
