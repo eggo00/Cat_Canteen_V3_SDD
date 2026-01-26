@@ -5,10 +5,11 @@ Currently uses stub implementation; will be replaced with real ML models.
 
 Performance requirement: Response time ≤ 500ms (SC-009)
 """
+import base64
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.v1.schemas.ai_schemas import (
@@ -19,7 +20,15 @@ from src.api.v1.schemas.ai_schemas import (
     RecommendationResponse,
     UserPreferenceResponse,
 )
+from src.api.v1.schemas.menu_extract_schemas import (
+    MenuDraft,
+    MenuDraftCategory,
+    MenuDraftItem,
+    MenuExtractResponse,
+)
 from src.infrastructure.ai.ai_service_stub import AIServiceStub, get_ai_service
+from src.infrastructure.ai.menu_extractor import get_menu_extractor
+from src.infrastructure.ai.rate_limiter import get_rate_limiter
 from src.infrastructure.database.session import get_async_session
 from src.infrastructure.repositories.brand_repository_impl import BrandRepositoryImpl
 
@@ -296,3 +305,154 @@ async def get_user_preferences(
         dietary_preferences=result.dietary_preferences,
         order_frequency=result.order_frequency,
     )
+
+
+# ============================================================================
+# Menu Extraction Endpoints (Phase I - AI Recognition)
+# ============================================================================
+
+
+@router.post(
+    "/menu/extract",
+    response_model=MenuDraft,
+    summary="Extract menu from image using AI",
+    description="Upload a menu image and use AI to extract menu items. Returns a MenuDraft for human review.",
+)
+async def extract_menu_from_image(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+    image: UploadFile = File(..., description="Menu image to extract (JPEG, PNG, WebP)"),
+    brand_id: str = Form(..., description="Brand ID for the menu"),
+    user_id: str = Form(..., description="User ID for rate limiting"),
+) -> MenuDraft:
+    """Extract menu items from an uploaded image using AI.
+
+    This endpoint uses Claude Vision API to recognize menu items from images.
+    The result is returned as a MenuDraft that requires human confirmation
+    before being saved to the official menu.
+
+    Rate limits apply:
+    - Per-brand: 50 requests/day
+    - Per-user: 10 requests/hour
+    - Global: 30 requests/minute
+
+    Args:
+        session: Database session
+        image: Uploaded menu image file
+        brand_id: Brand identifier
+        user_id: User identifier for rate limiting
+
+    Returns:
+        MenuDraft: Extracted menu data pending human review
+
+    Raises:
+        HTTPException 400: Invalid image format
+        HTTPException 404: Brand not found
+        HTTPException 429: Rate limit exceeded
+        HTTPException 500: AI service error
+    """
+    # Validate brand exists
+    brand_repository = BrandRepositoryImpl(session)
+    brand = await brand_repository.get_by_id(UUID(brand_id))
+
+    if brand is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Brand not found: {brand_id}",
+        )
+
+    # Check rate limits
+    rate_limiter = get_rate_limiter()
+    allowed, error_message = rate_limiter.check_and_consume(brand_id, user_id)
+
+    if not allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=error_message,
+        )
+
+    # Validate image type
+    if image.content_type not in ["image/jpeg", "image/png", "image/webp"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"不支援的圖片格式：{image.content_type}。請上傳 JPEG、PNG 或 WebP 圖片。",
+        )
+
+    # Read and encode image
+    try:
+        image_content = await image.read()
+        image_base64 = base64.b64encode(image_content).decode("utf-8")
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"無法讀取圖片：{str(e)}",
+        )
+
+    # Get menu extractor and extract
+    try:
+        extractor = get_menu_extractor()
+        result = await extractor.extract(image_base64)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
+
+    # Check for extraction errors
+    if not result.success:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=result.error_message or "AI 辨識失敗",
+        )
+
+    # Convert to MenuDraft
+    draft_categories = []
+    for cat in result.categories:
+        draft_items = []
+        for item in cat.items:
+            needs_review = item.price == 0
+            draft_items.append(
+                MenuDraftItem(
+                    name=item.name,
+                    price=item.price,
+                    description=item.description,
+                    needs_review=needs_review,
+                    review_reason="價格為 0，請確認" if needs_review else None,
+                )
+            )
+        draft_categories.append(
+            MenuDraftCategory(
+                name=cat.name,
+                items=draft_items,
+            )
+        )
+
+    return MenuDraft(
+        source="ai_extract",
+        brand_id=brand_id,
+        categories=draft_categories,
+        warnings=result.warnings,
+        stats=result.stats,
+        raw_text=result.raw_text,
+    )
+
+
+@router.get(
+    "/menu/extract/quota",
+    summary="Get AI extraction quota",
+    description="Get remaining AI extraction quota for brand and user",
+)
+async def get_extraction_quota(
+    brand_id: str = Query(..., description="Brand ID"),
+    user_id: str = Query(..., description="User ID"),
+) -> dict:
+    """Get remaining AI extraction quota.
+
+    Args:
+        brand_id: Brand identifier
+        user_id: User identifier
+
+    Returns:
+        Dict with remaining quota information
+    """
+    rate_limiter = get_rate_limiter()
+    return rate_limiter.get_remaining_quota(brand_id, user_id)

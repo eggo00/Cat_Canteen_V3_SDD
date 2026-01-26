@@ -1,9 +1,10 @@
 /**
  * AI API client
- * Handles all AI recommendation and prediction API requests
+ * Handles all AI recommendation, prediction, and menu extraction API requests
  */
 
 import { get } from '../../../shared/utils/api';
+import apiClient from '../../../shared/utils/api';
 import {
   AIStatus,
   DemandForecastResponse,
@@ -12,6 +13,13 @@ import {
   RecommendationResponse,
   UserPreference,
 } from '../../../shared/types/ai';
+import {
+  MenuDraft,
+  MenuDraftItem,
+  MenuDraftCategory,
+  ExtractionStats,
+  ExtractionQuota,
+} from '../../../shared/types/menuExtract';
 
 /**
  * Transform recommendation item from snake_case API response
@@ -194,10 +202,116 @@ export async function getUserPreferences(
   return transformUserPreference(response);
 }
 
+// ============================================================================
+// Menu Extraction API functions
+// ============================================================================
+
+/**
+ * Transform menu draft item from snake_case API response
+ */
+function transformMenuDraftItem(data: Record<string, unknown>): MenuDraftItem {
+  return {
+    tempId: data.temp_id as string,
+    name: data.name as string,
+    price: data.price as number,
+    description: data.description as string | null,
+    needsReview: data.needs_review as boolean,
+    reviewReason: data.review_reason as string | null,
+  };
+}
+
+/**
+ * Transform menu draft category from snake_case API response
+ */
+function transformMenuDraftCategory(data: Record<string, unknown>): MenuDraftCategory {
+  const items = (data.items as Record<string, unknown>[]) || [];
+  return {
+    tempId: data.temp_id as string,
+    name: data.name as string,
+    items: items.map(transformMenuDraftItem),
+  };
+}
+
+/**
+ * Transform extraction stats from snake_case API response
+ */
+function transformExtractionStats(data: Record<string, unknown>): ExtractionStats {
+  return {
+    totalItems: data.total_items as number,
+    itemsNeedReview: data.items_need_review as number,
+  };
+}
+
+/**
+ * Transform menu draft from snake_case API response
+ */
+function transformMenuDraft(data: Record<string, unknown>): MenuDraft {
+  const categories = (data.categories as Record<string, unknown>[]) || [];
+  const stats = data.stats as Record<string, unknown>;
+  return {
+    source: data.source as MenuDraft['source'],
+    brandId: data.brand_id as string,
+    categories: categories.map(transformMenuDraftCategory),
+    warnings: data.warnings as string[],
+    stats: transformExtractionStats(stats),
+    createdAt: data.created_at as string,
+    originalImageUrl: data.original_image_url as string | null,
+    rawText: data.raw_text as string | null,
+    originalFileName: data.original_file_name as string | null,
+  };
+}
+
+/**
+ * Transform extraction quota from snake_case API response
+ */
+function transformExtractionQuota(data: Record<string, unknown>): ExtractionQuota {
+  return {
+    brandDailyRemaining: data.brand_daily_remaining as number,
+    userHourlyRemaining: data.user_hourly_remaining as number,
+    globalRpmRemaining: data.global_rpm_remaining as number,
+  };
+}
+
+/**
+ * Extract menu from image using AI
+ */
+export async function extractMenuFromImage(
+  image: File,
+  brandId: string,
+  userId: string
+): Promise<MenuDraft> {
+  const formData = new FormData();
+  formData.append('image', image);
+  formData.append('brand_id', brandId);
+  formData.append('user_id', userId);
+
+  const response = await apiClient.post<Record<string, unknown>>('/ai/menu/extract', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return transformMenuDraft(response.data);
+}
+
+/**
+ * Get AI extraction quota
+ */
+export async function getExtractionQuota(
+  brandId: string,
+  userId: string
+): Promise<ExtractionQuota> {
+  const response = await get<Record<string, unknown>>(
+    `/ai/menu/extract/quota?brand_id=${brandId}&user_id=${userId}`
+  );
+  return transformExtractionQuota(response);
+}
+
 export default {
   getAIStatus,
   getRecommendations,
   getRecommendationsById,
   getDemandForecast,
   getUserPreferences,
+  extractMenuFromImage,
+  getExtractionQuota,
 };

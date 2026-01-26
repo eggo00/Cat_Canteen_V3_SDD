@@ -12,6 +12,8 @@ import { CheckoutPage } from './pages/CheckoutPage';
 import { OrderStatusPage } from './pages/OrderStatusPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import LoginPage from './pages/LoginPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
+import MenuUploadPage from './pages/MenuUploadPage';
 import { AdminRoute } from './features/auth';
 
 // Create a client for React Query
@@ -107,6 +109,22 @@ function App(): JSX.Element {
             <Route path="/:brandSlug/order/:orderNumber" element={<OrderStatusPage />} />
 
             {/* Admin routes - protected */}
+            <Route
+              path="/:brandSlug/admin"
+              element={
+                <AdminRoute>
+                  <AdminDashboardPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/:brandSlug/admin/menu/upload"
+              element={
+                <AdminRoute>
+                  <MenuUploadPage />
+                </AdminRoute>
+              }
+            />
             <Route
               path="/:brandSlug/analytics"
               element={

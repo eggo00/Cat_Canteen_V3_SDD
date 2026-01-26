@@ -64,6 +64,38 @@ class Settings(BaseSettings):
         exclude=True,  # Don't include in model dict
     )
 
+    # AI Menu Extraction
+    AI_PROVIDER: str = Field(
+        default="claude",
+        description="AI provider for menu extraction (claude, openai, gemini)",
+    )
+    ANTHROPIC_API_KEY: str | None = Field(
+        default=None,
+        description="Anthropic API key for Claude Vision",
+    )
+    OPENAI_API_KEY: str | None = Field(
+        default=None,
+        description="OpenAI API key for GPT-4V",
+    )
+    GOOGLE_AI_API_KEY: str | None = Field(
+        default=None,
+        description="Google AI API key for Gemini",
+    )
+
+    # AI Rate Limiting (cost protection)
+    AI_DAILY_LIMIT_PER_BRAND: int = Field(
+        default=50,
+        description="Maximum AI requests per brand per day",
+    )
+    AI_HOURLY_LIMIT_PER_USER: int = Field(
+        default=10,
+        description="Maximum AI requests per user per hour",
+    )
+    AI_GLOBAL_RPM_LIMIT: int = Field(
+        default=30,
+        description="Maximum AI requests globally per minute",
+    )
+
     @property
     def ALLOWED_ORIGINS(self) -> list[str]:
         """Parse ALLOWED_ORIGINS from comma-separated string."""

@@ -27,6 +27,8 @@ dependencies = [
     "python-jose[cryptography]>=3.3.0",
     # HTTP Client (for external APIs)
     "httpx>=0.26.0",
+    # AI Providers
+    "anthropic>=0.30.0",  # Claude Vision API for menu extraction
     # Utilities
     "python-dotenv>=1.0.0",
     "greenlet>=3.3.0",
