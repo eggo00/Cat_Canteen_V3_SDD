@@ -74,7 +74,7 @@ class CreateOrder:
         # Verify brand exists and is active
         brand = await self.brand_repository.get_by_id(brand_id)
         if not brand:
-            raise NotFoundError(f"Brand not found: {brand_id}")
+            raise NotFoundError("Brand", str(brand_id))
 
         if not brand.is_active:
             raise ValidationError(f"Brand is not active: {brand.name}")
@@ -97,7 +97,7 @@ class CreateOrder:
             # Get menu item to verify it exists and get current price/name
             menu_item = await self.menu_repository.get_menu_item_by_id(menu_item_id)
             if not menu_item:
-                raise NotFoundError(f"Menu item not found: {menu_item_id}")
+                raise NotFoundError("MenuItem", str(menu_item_id))
 
             if not menu_item.is_available:
                 raise ValidationError(f"Menu item is not available: {menu_item.name}")
