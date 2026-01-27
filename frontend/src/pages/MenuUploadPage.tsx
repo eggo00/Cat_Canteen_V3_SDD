@@ -7,7 +7,7 @@ import React, { useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../features/auth/hooks/useAuth';
 import { extractMenuFromImage, getExtractionQuota } from '../features/ai/api/aiApi';
-import { MenuDraft, MenuDraftCategory, MenuDraftItem, ExtractionQuota } from '../shared/types/menuExtract';
+import { MenuDraft, ExtractionQuota } from '../shared/types/menuExtract';
 
 /**
  * Page styles
