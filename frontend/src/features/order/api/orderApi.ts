@@ -38,13 +38,16 @@ function transformOrderItem(data: Record<string, unknown>): OrderItem {
  * Transform order from snake_case API response to camelCase
  */
 function transformOrderResponse(data: Record<string, unknown>): OrderResponse {
-  const items = (data.order_items as Record<string, unknown>[] | undefined) || [];
+  // Backend returns 'items' not 'order_items'
+  const items = (data.items as Record<string, unknown>[] | undefined) ||
+                (data.order_items as Record<string, unknown>[] | undefined) || [];
   return {
     id: data.id as string,
     orderNumber: data.order_number as string,
     customerName: data.customer_name as string,
     status: data.status as OrderStatus,
-    totalAmount: data.total_amount as number,
+    // Backend returns 'total' not 'total_amount'
+    totalAmount: (data.total as number) ?? (data.total_amount as number) ?? 0,
     orderItems: items.map(transformOrderItem),
     createdAt: data.created_at as string,
   };
@@ -54,7 +57,9 @@ function transformOrderResponse(data: Record<string, unknown>): OrderResponse {
  * Transform full order from snake_case API response
  */
 function transformOrder(data: Record<string, unknown>): Order {
-  const items = (data.order_items as Record<string, unknown>[] | undefined) || [];
+  // Backend returns 'items' not 'order_items'
+  const items = (data.items as Record<string, unknown>[] | undefined) ||
+                (data.order_items as Record<string, unknown>[] | undefined) || [];
   return {
     id: data.id as string,
     brandId: data.brand_id as string,
@@ -63,7 +68,8 @@ function transformOrder(data: Record<string, unknown>): Order {
     customerPhone: data.customer_phone as string,
     customerEmail: data.customer_email as string | undefined,
     status: data.status as OrderStatus,
-    totalAmount: data.total_amount as number,
+    // Backend returns 'total' not 'total_amount'
+    totalAmount: (data.total as number) ?? (data.total_amount as number) ?? 0,
     notes: data.notes as string | undefined,
     orderItems: items.map(transformOrderItem),
     createdAt: data.created_at as string,
