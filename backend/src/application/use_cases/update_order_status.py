@@ -47,7 +47,7 @@ class UpdateOrderStatus:
         # Get existing order
         order = await self.order_repository.get_by_id(order_id)
         if not order:
-            raise NotFoundError(f"Order not found: {order_id}")
+            raise NotFoundError("Order", str(order_id))
 
         # Validate transition
         if not order.status.can_transition_to(new_status):
@@ -58,7 +58,7 @@ class UpdateOrderStatus:
         # Update status
         updated_order = await self.order_repository.update_status(order_id, new_status)
         if not updated_order:
-            raise NotFoundError(f"Order not found: {order_id}")
+            raise NotFoundError("Order", str(order_id))
 
         return updated_order
 
@@ -186,7 +186,7 @@ class CancelOrder:
         # Get existing order
         order = await self.order_repository.get_by_id(order_id)
         if not order:
-            raise NotFoundError(f"Order not found: {order_id}")
+            raise NotFoundError("Order", str(order_id))
 
         # Check if can be cancelled
         if order.status.is_final:
@@ -199,6 +199,6 @@ class CancelOrder:
             order_id, OrderStatus.CANCELLED
         )
         if not updated_order:
-            raise NotFoundError(f"Order not found: {order_id}")
+            raise NotFoundError("Order", str(order_id))
 
         return updated_order

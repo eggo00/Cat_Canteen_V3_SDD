@@ -36,7 +36,7 @@ class GetOrder:
         """
         order = await self.order_repository.get_by_id(order_id)
         if not order:
-            raise NotFoundError(f"Order not found: {order_id}")
+            raise NotFoundError("Order", str(order_id))
         return order
 
     async def execute_by_order_number(self, order_number: str) -> Order:
@@ -53,7 +53,7 @@ class GetOrder:
         """
         order = await self.order_repository.get_by_order_number(order_number)
         if not order:
-            raise NotFoundError(f"Order not found: {order_number}")
+            raise NotFoundError("Order", order_number)
         return order
 
 
