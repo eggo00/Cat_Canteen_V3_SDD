@@ -19,6 +19,7 @@ class MenuItem:
         description: str | None = None,
         customization_options: list[CustomizationOption] | None = None,
         id: UUID | None = None,
+        is_available: bool = True,
     ) -> None:
         """Initialize menu item.
 
@@ -29,6 +30,7 @@ class MenuItem:
             description: Optional item description
             customization_options: List of customization options
             id: Unique identifier (auto-generated if not provided)
+            is_available: Whether item is available for ordering
 
         Raises:
             ValidationError: If validation fails
@@ -53,6 +55,7 @@ class MenuItem:
         self.display_order = display_order
         self.description = description
         self.customization_options = customization_options or []
+        self.is_available = is_available
 
     def add_customization_option(self, option: CustomizationOption) -> None:
         """Add a customization option to the menu item.

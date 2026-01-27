@@ -435,6 +435,7 @@ class MenuRepositoryImpl(MenuRepository):
             price=float(model.price),
             display_order=model.display_order,
             customization_options=customization_options,
+            is_available=model.is_available,
         )
 
     def _customization_option_to_entity(
