@@ -117,12 +117,19 @@ async def seed_database():
         result = await session.execute(
             text("SELECT id FROM users WHERE email = 'admin@catcanteen.com'")
         )
-        if result.fetchone():
-            print("Admin user already exists.")
+        existing_admin = result.fetchone()
+        password_hash = PasswordHasher.hash_password("Admin123!")
+
+        if existing_admin:
+            # Update existing admin's password (in case it was corrupted)
+            await session.execute(
+                text("UPDATE users SET password_hash = :password_hash WHERE email = 'admin@catcanteen.com'"),
+                {"password_hash": password_hash}
+            )
+            print("Admin user exists. Password has been reset to: Admin123!")
         else:
             # Create admin user
             admin_id = uuid4()
-            password_hash = PasswordHasher.hash("Admin123!")
 
             await session.execute(
                 text("""
