@@ -149,40 +149,17 @@ async def seed_database() -> dict[str, Any]:
         results["created"].append("Database tables (fresh)")
 
     async with AsyncSessionLocal() as session:
-        # Check if admin already exists
-        result = await session.execute(
-            text("SELECT id FROM users WHERE email = 'admin@catcanteen.com'")
-        )
-        if result.fetchone():
-            results["skipped"].append("Admin user already exists")
-        else:
-            # Create admin user
-            admin_id = uuid4()
-            # Pre-computed bcrypt hash for "admin123" to avoid runtime hashing issues
-            password_hash = "$2b$12$5hFqXKti7y1GXSD7kVjPbupKdRZZAj6LnSX5ghk2jnGu0ZSPeGmeq"
+        # Pre-computed bcrypt hash for "admin123" to avoid runtime hashing issues
+        password_hash = "$2b$12$5hFqXKti7y1GXSD7kVjPbupKdRZZAj6LnSX5ghk2jnGu0ZSPeGmeq"
 
-            await session.execute(
-                text("""
-                    INSERT INTO users (id, email, password_hash, full_name, role, is_active)
-                    VALUES (:id, :email, :password_hash, :name, :role, TRUE)
-                """),
-                {
-                    "id": str(admin_id),
-                    "email": "admin@catcanteen.com",
-                    "password_hash": password_hash,
-                    "name": "Super Admin",
-                    "role": "super_admin",
-                }
-            )
-            results["created"].append("Admin user: admin@catcanteen.com / admin123")
-
-        # Check if demo brand exists
+        # Check if demo brand exists (create brand first so we can link admin to it)
         result = await session.execute(
             text("SELECT id FROM brands WHERE slug = 'demo-cafe'")
         )
         brand_row = result.fetchone()
 
         if brand_row:
+            brand_id = brand_row[0]
             results["skipped"].append("Demo brand already exists")
         else:
             # Create demo brand with theme_config as JSONB
@@ -264,6 +241,36 @@ async def seed_database() -> dict[str, Any]:
                     }
                 )
             results["created"].append(f"Menu items: {len(menu_items)} items")
+
+        # Now create admin user with brand_id (after brand exists)
+        result = await session.execute(
+            text("SELECT id FROM users WHERE email = 'admin@catcanteen.com'")
+        )
+        if result.fetchone():
+            # Update existing admin to have brand_id
+            await session.execute(
+                text("UPDATE users SET brand_id = :brand_id, role = 'admin' WHERE email = 'admin@catcanteen.com'"),
+                {"brand_id": str(brand_id)}
+            )
+            results["skipped"].append("Admin user updated with brand_id")
+        else:
+            # Create admin user linked to demo-cafe brand
+            admin_id = uuid4()
+            await session.execute(
+                text("""
+                    INSERT INTO users (id, email, password_hash, full_name, role, brand_id, is_active)
+                    VALUES (:id, :email, :password_hash, :name, :role, :brand_id, TRUE)
+                """),
+                {
+                    "id": str(admin_id),
+                    "email": "admin@catcanteen.com",
+                    "password_hash": password_hash,
+                    "name": "Demo Admin",
+                    "role": "admin",
+                    "brand_id": str(brand_id),
+                }
+            )
+            results["created"].append("Admin user: admin@catcanteen.com / admin123")
 
         await session.commit()
 
