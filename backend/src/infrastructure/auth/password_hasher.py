@@ -1,8 +1,5 @@
-"""Password hashing utilities using bcrypt."""
-from passlib.context import CryptContext
-
-# Configure password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+"""Password hashing utilities using bcrypt directly."""
+import bcrypt
 
 
 class PasswordHasher:
@@ -18,7 +15,11 @@ class PasswordHasher:
         Returns:
             str: Hashed password
         """
-        return pwd_context.hash(password)
+        salt = bcrypt.gensalt(rounds=12)
+        return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
+
+    # Alias for backward compatibility
+    hash = hash_password
 
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -31,18 +32,10 @@ class PasswordHasher:
         Returns:
             bool: True if password matches, False otherwise
         """
-        return pwd_context.verify(plain_password, hashed_password)
+        return bcrypt.checkpw(
+            plain_password.encode("utf-8"),
+            hashed_password.encode("utf-8"),
+        )
 
-    @staticmethod
-    def needs_rehash(hashed_password: str) -> bool:
-        """Check if a hashed password needs to be rehashed.
-
-        Useful for updating passwords when the hashing algorithm is upgraded.
-
-        Args:
-            hashed_password: Hashed password to check
-
-        Returns:
-            bool: True if password needs rehashing
-        """
-        return pwd_context.needs_update(hashed_password)
+    # Alias for backward compatibility
+    verify = verify_password
