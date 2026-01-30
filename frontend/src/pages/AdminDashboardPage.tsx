@@ -254,8 +254,6 @@ export default function AdminDashboardPage(): JSX.Element {
             icon="🛒"
             title="Order Management"
             description="View and manage incoming orders."
-            disabled
-            comingSoon
           />
 
           {/* Users */}
