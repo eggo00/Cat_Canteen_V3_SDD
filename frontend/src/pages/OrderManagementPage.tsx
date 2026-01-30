@@ -35,7 +35,6 @@ export default function OrderManagementPage() {
     isLoading,
     error,
     updateStatus,
-    confirm,
     cancel,
     isUpdating,
   } = useOrders(user?.brandId || undefined, {
@@ -46,11 +45,7 @@ export default function OrderManagementPage() {
   const handleNextStatus = async (order: OrderResponse) => {
     const next = getNextStatus(order.status);
     if (!next) return;
-    if (next === 'confirmed') {
-      await confirm(order.id);
-    } else {
-      await updateStatus(order.id, next);
-    }
+    await updateStatus(order.id, next);
   };
 
   const handleCancel = async (orderId: string) => {
