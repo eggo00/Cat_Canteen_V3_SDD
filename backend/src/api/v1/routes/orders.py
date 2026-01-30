@@ -28,6 +28,7 @@ from src.application.use_cases.update_order_status import (
 from src.domain.entities.order import Order
 from src.domain.exceptions import NotFoundError, ValidationError
 from src.domain.services.order_service import OrderService
+from src.domain.value_objects.order_status import OrderStatus as DomainOrderStatus
 from src.infrastructure.database.session import get_async_session
 from src.infrastructure.repositories.brand_repository_impl import BrandRepositoryImpl
 from src.infrastructure.repositories.menu_repository_impl import MenuRepositoryImpl
@@ -250,9 +251,10 @@ async def list_orders_by_brand(
         )
 
         # Get total count
+        domain_status = DomainOrderStatus.from_string(status_filter.value) if status_filter else None
         total = await order_repo.count_by_brand(
             brand_id=brand_id,
-            status=status_filter.value if status_filter else None,
+            status=domain_status,
         )
 
         return OrderListResponse(
