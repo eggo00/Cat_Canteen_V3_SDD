@@ -168,8 +168,8 @@ export async function getOrdersByBrand(
   const url = queryString
     ? `/orders/brands/${brandId}?${queryString}`
     : `/orders/brands/${brandId}`;
-  const response = await get<Record<string, unknown>[]>(url);
-  return response.map(transformOrderResponse);
+  const response = await get<{ orders: Record<string, unknown>[] }>(url);
+  return (response.orders || []).map(transformOrderResponse);
 }
 
 /**
