@@ -228,8 +228,6 @@ export default function AdminDashboardPage(): JSX.Element {
             icon="📋"
             title="Menu Management"
             description="View and edit your current menu items, categories, and prices."
-            disabled
-            comingSoon
           />
 
           {/* Brand Settings */}
@@ -262,8 +260,6 @@ export default function AdminDashboardPage(): JSX.Element {
             icon="👥"
             title="User Management"
             description="Manage staff accounts and permissions."
-            disabled
-            comingSoon
           />
         </div>
       </main>
