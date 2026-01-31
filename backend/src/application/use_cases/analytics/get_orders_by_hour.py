@@ -32,9 +32,8 @@ class GetOrdersByHour:
     peak ordering times and optimize staffing.
     """
 
-    # All non-cancelled statuses count for distribution analysis
+    # Confirmed and beyond count for distribution analysis
     ANALYSIS_STATUSES = {
-        OrderStatus.PENDING,
         OrderStatus.CONFIRMED,
         OrderStatus.PREPARING,
         OrderStatus.READY,

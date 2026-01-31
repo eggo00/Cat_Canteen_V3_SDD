@@ -45,8 +45,13 @@ class GetRevenueStats:
     for a brand within a specified date range.
     """
 
-    # Statuses that count as revenue (completed orders)
-    REVENUE_STATUSES = {OrderStatus.COMPLETED, OrderStatus.READY}
+    # Statuses that count as revenue (confirmed and beyond)
+    REVENUE_STATUSES = {
+        OrderStatus.CONFIRMED,
+        OrderStatus.PREPARING,
+        OrderStatus.READY,
+        OrderStatus.COMPLETED,
+    }
 
     def __init__(
         self,
