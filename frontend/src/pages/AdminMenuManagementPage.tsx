@@ -11,7 +11,7 @@ import {
   deleteCategory,
   uploadMenu,
 } from '../features/menu/api/menuApi';
-import { Category, MenuItem, UploadMenuRequest } from '../shared/types/menu';
+import { Category, UploadMenuRequest } from '../shared/types/menu';
 
 const styles = {
   container: {
@@ -280,7 +280,7 @@ export default function AdminMenuManagementPage() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
 
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [, setCategories] = useState<Category[]>([]);
   const [editedCategories, setEditedCategories] = useState<Category[]>([]);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
