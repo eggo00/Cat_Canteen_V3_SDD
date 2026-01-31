@@ -6,7 +6,7 @@ SQLAlchemy-based implementation of the OrderRepository interface.
 from datetime import date, datetime
 from uuid import UUID
 
-from sqlalchemy import Date, and_, cast, extract, func, select
+from sqlalchemy import Date, and_, cast, extract, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -523,9 +523,12 @@ class OrderRepositoryImpl(OrderRepository):
 
         status_values = [s.value for s in statuses]
 
+        # Convert UTC to Asia/Taipei (UTC+8) before extracting hour
+        local_time = func.timezone(text("'Asia/Taipei'"), OrderModel.created_at)
+
         query = (
             select(
-                extract("hour", OrderModel.created_at).label("hour"),
+                extract("hour", local_time).label("hour"),
                 func.count(OrderModel.id).label("order_count"),
                 func.sum(OrderModel.total_amount).label("total_revenue"),
             )
@@ -537,8 +540,8 @@ class OrderRepositoryImpl(OrderRepository):
                     OrderModel.status.in_(status_values),
                 )
             )
-            .group_by(extract("hour", OrderModel.created_at))
-            .order_by(extract("hour", OrderModel.created_at))
+            .group_by(extract("hour", local_time))
+            .order_by(extract("hour", local_time))
         )
 
         result = await self.session.execute(query)
